@@ -17,7 +17,7 @@ namespace Server.Game
         private string gameField;
         internal string name;
         private int[] beginPosition;
-        private int width;
+        internal int width;
 
         // paths to item-data
         private Dictionary<string, MonsterType> monsterData;
@@ -40,7 +40,37 @@ namespace Server.Game
                 // draw the doors
                 foreach (Door door in doors)
                 {
-                    copy.ReplaceAt(door.positionIndex, 1, "$");
+                    copy = copy.ReplaceAt(door.positionIndex, 1, "$");
+                }
+                // draw the monsters
+                foreach(Monster monster in monsters)
+                {
+                    copy = copy.ReplaceAt(monster.positionIndex, 1, "@");
+                }
+                // draw the healing bottles
+                foreach(HealingBottle heal in healingBottles)
+                {
+                    copy = copy.ReplaceAt(heal.positionIndex, 1, "+");
+                }
+                // draw the experience bottles
+                foreach(ExperienceBottle experience in experienceBottles)
+                {
+                    copy = copy.ReplaceAt(experience.positionIndex, 1, "&");
+                }
+                // draw the traps
+                foreach(KeyValuePair<string, Trap[]> trapGroup in traps)
+                {
+                    foreach(Trap trap in trapGroup.Value)
+                    {
+                        if(trap.activated)
+                        {
+                            copy = copy.ReplaceAt(trap.positionIndex, 1, "#");
+                        }
+                        else
+                        {
+                            copy = copy.ReplaceAt(trap.positionIndex, 1, "*");
+                        }
+                    }
                 }
                 return copy;
             }

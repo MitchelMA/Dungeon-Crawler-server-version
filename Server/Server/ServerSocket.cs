@@ -49,10 +49,7 @@ namespace Server.Server
                 Scene scene = new Scene(gameReference, name);
                 scenes.Add(scene.name, scene);
             }
-            foreach(KeyValuePair<String, Scene> pair in scenes)
-            {
-                Console.WriteLine($"{pair.Key}: {pair.Value}");
-            }
+            Console.WriteLine(scenes.First().Value.GameField);
         }
     }
 }
