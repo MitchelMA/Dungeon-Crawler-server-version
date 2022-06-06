@@ -1,4 +1,5 @@
 ﻿using System;
+using Client.Client;
 
 namespace Client
 {
@@ -6,7 +7,8 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            ClientSocket client = new ClientSocket("localhost", 5500, false);
+            client.Start();
         }
     }
 }

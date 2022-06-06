@@ -88,7 +88,7 @@ namespace Server.Server
         private void GameLoop(Player player)
         {
             Scene currentScene = player.scene;
-            SendMessage(player.socket, "mooi");
+            SendMessage(player.socket, currentScene.GameField);
         }
 
         private static string GetMessage(Socket client)
@@ -113,12 +113,14 @@ namespace Server.Server
         {
             string messageLength;
 
-            int len = message.Length;
+            int len = Encoding.UTF8.GetByteCount(message);
             messageLength = len.ToString();
             for(int i = len.ToString().Length; i < header; i++)
             {
                 messageLength += " ";
             }
+
+            Console.WriteLine(Encoding.UTF8.GetByteCount(message));
 
             // send the length of the message and the message respectively
             client.Send(Encoding.UTF8.GetBytes(messageLength));
