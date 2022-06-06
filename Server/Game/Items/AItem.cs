@@ -18,7 +18,10 @@ namespace Server.Game.Items
         
         internal AItem(int[] position, int sceneWidth)
         {
-            this.position = position;
+            // DO NOT TAKE OVER THE MEMORY ADDRES
+            // INSTEAD COPY, LIKE HERE BELOW
+            this.position[0] = position[0];
+            this.position[1] = position[1];
             positionIndex = this.position[1] * sceneWidth + this.position[1] + this.position[0];
         }
     }

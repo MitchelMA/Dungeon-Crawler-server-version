@@ -81,17 +81,32 @@ namespace Server.Server
             PlayerStructure playerStructure = Serializer.Deserialize<PlayerStructure>(Path.Combine(@".\game-data\", gameReference.ItemDataPath, @"player.json"));
             Scene first = scenes.First().Value;
             Player player = new Player(playerStructure.Hp, first.beginPosition, playerStructure.Damage, playerStructure.XpNeededNext, first, client);
+            // add the player to this scene and to the global game
             first.AddplayerToScene(player);
+            AddPlayer(player);
+            UpdateStatus(player.scene);
+            try
+            {
+                if (player == players[1])
+                {
+                    players[0].Move(2, 0);
+                }
+            }
+            catch { }
+
+            // update the this scene
+            UpdatePlayers(player.scene);
             return player;
         }
 
         private void GameLoop(Player player)
         {
-            Scene currentScene = player.scene;
-            SendMessage(player.socket, currentScene.GameField);
+            Console.WriteLine(players.Count);
+            //Scene currentScene = player.scene;
+            //SendMessage(player.socket, currentScene.GameField);
         }
 
-        private static string GetMessage(Socket client)
+        internal static string GetMessage(Socket client)
         {
             string data = null;
             byte[] bytes = new byte[header];
@@ -109,7 +124,7 @@ namespace Server.Server
             return data;
         }
 
-        private static void SendMessage(Socket client, string message)
+        internal static void SendMessage(Socket client, string message)
         {
             string messageLength;
 
@@ -125,6 +140,45 @@ namespace Server.Server
             // send the length of the message and the message respectively
             client.Send(Encoding.UTF8.GetBytes(messageLength));
             client.Send(Encoding.UTF8.GetBytes(message));
+        }
+
+        /// <summary>
+        /// Updates the players in the scene.</br>
+        /// This method also removes all the disconnected players. </br>
+        /// Because of this, this is the safe way to update all the players in a specific scene.
+        /// </summary>
+        /// <param name="scene">The scene's players you want to update</param>
+        private void UpdatePlayers(Scene scene)
+        {
+            List<Player> disconnected = scene.Update();
+            Console.WriteLine("Disconnected count: " + disconnected.Count);
+            
+            foreach(Player disconnect in disconnected)
+            {
+                players.Remove(disconnect);
+            }
+        }
+        /// <summary>
+        /// Does what UpdatePlayers() does, except that it doesn't send the players the GameField
+        /// </summary>
+        /// <param name="scene">The scene whose status you want to update</param>
+        private void UpdateStatus(Scene scene)
+        {
+            List<Player> disconnected = scene.UpdateStatus();
+            Console.WriteLine("Disconnected count: " + disconnected.Count);
+            foreach(Player disconnect in disconnected)
+            {
+                players.Remove(disconnect);
+            }
+        }
+        private bool AddPlayer(Player player)
+        {
+            if(players.Contains(player))
+            {
+                return false;
+            }
+            players.Add(player);
+            return true;
         }
     }
 }

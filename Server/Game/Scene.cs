@@ -8,6 +8,7 @@ using System.Text.Json;
 using Server.Game.Items;
 using Server.Game.DataStructures;
 using Shared;
+using Server.Server;
 
 namespace Server.Game
 {
@@ -35,7 +36,7 @@ namespace Server.Game
         internal string GameField
         {
             get
-                {
+            {
                 var copy = this.gameField;
                 // draw the doors
                 foreach (Door door in doors)
@@ -43,26 +44,26 @@ namespace Server.Game
                     copy = copy.ReplaceAt(door.positionIndex, 1, "$");
                 }
                 // draw the monsters
-                foreach(Monster monster in monsters)
+                foreach (Monster monster in monsters)
                 {
                     copy = copy.ReplaceAt(monster.positionIndex, 1, "@");
                 }
                 // draw the healing bottles
-                foreach(HealingBottle heal in healingBottles)
+                foreach (HealingBottle heal in healingBottles)
                 {
                     copy = copy.ReplaceAt(heal.positionIndex, 1, "+");
                 }
                 // draw the experience bottles
-                foreach(ExperienceBottle experience in experienceBottles)
+                foreach (ExperienceBottle experience in experienceBottles)
                 {
                     copy = copy.ReplaceAt(experience.positionIndex, 1, "&");
                 }
                 // draw the traps
-                foreach(KeyValuePair<string, Trap[]> trapGroup in traps)
+                foreach (KeyValuePair<string, Trap[]> trapGroup in traps)
                 {
-                    foreach(Trap trap in trapGroup.Value)
+                    foreach (Trap trap in trapGroup.Value)
                     {
-                        if(trap.activated)
+                        if (trap.activated)
                         {
                             copy = copy.ReplaceAt(trap.positionIndex, 1, "#");
                         }
@@ -71,6 +72,14 @@ namespace Server.Game
                             copy = copy.ReplaceAt(trap.positionIndex, 1, "*");
                         }
                     }
+                }
+                // now draw the players on top of everything
+                int index = 0;
+                foreach (Player player in players)
+                {
+                    Console.WriteLine($"index: {index}; player-pos: [{player.position[0]}, {player.position[1]}]; addr: {player.socket.RemoteEndPoint}");
+                    copy = copy.ReplaceAt(player.InSceneIndex, 1, "¶");
+                    index++;
                 }
                 return copy;
             }
@@ -101,8 +110,6 @@ namespace Server.Game
             beginPosition = structure.BeginPosition;
             // set the width
             width = structure.Width;
-
-            beginPosition = structure.BeginPosition;
             // set the doors
             if (structure.Doors != null)
             {
@@ -178,6 +185,53 @@ namespace Server.Game
         internal bool RemovePlayerFromScene(Player player)
         {
             return players.Remove(player);
+        }
+
+        /// <summary>
+        /// Sends the GameField to all connected players
+        /// </summary>
+        /// <returns>A list of players who got disconnected</returns>
+        internal List<Player> Update()
+        {
+            // first, get the list of disconnected players
+            // these have already been removed from this scene
+            List<Player> disconnected = UpdateStatus();
+            // after knowing which players got disconnected,
+            // only update the connected players
+            foreach (Player player in players)
+            {
+                ServerSocket.SendMessage(player.socket, GameField);
+            }
+            // at the end, return all the disconnected, so the server knows which one to clean up
+            return disconnected;
+        }
+
+        /// <summary>
+        /// Updates the status of this scene. </br>
+        /// Detecting which players disconnected and removing them
+        /// </summary>
+        /// <returns>Returns a list containing all the players who disconnected</returns>
+        internal List<Player> UpdateStatus()
+        {
+            List<Player> disconnected = new List<Player>();
+            // first, check for disconnected
+            foreach (Player player in players)
+            {
+                bool connected = player.socket.Poll(50, System.Net.Sockets.SelectMode.SelectRead);
+                if (connected)
+                {
+                    Console.WriteLine("Disconnection found");
+                    disconnected.Add(player);
+                    continue;
+                }
+            }
+            // then remove all the disconnected
+            foreach (Player disconnect in disconnected)
+            {
+                Console.WriteLine(RemovePlayerFromScene(disconnect));
+            }
+            Console.WriteLine("In scene: " + players.Count);
+            return disconnected;
         }
     }
 }

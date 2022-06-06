@@ -10,11 +10,11 @@ namespace Server.Game
 {
     internal class Player
     {
-        internal int[] position;
+        internal int[] position = new int[2];
         internal int InSceneIndex { get => position[1] * scene.width + position[1] + position[0]; }
         internal int currentHp;
         internal int maxHp;
-        internal int[] damage;
+        internal int[] damage = new int[2];
         internal int xpNecUp;
         internal int currentXp;
         internal int currentLvl = 1;
@@ -27,9 +27,13 @@ namespace Server.Game
             this.maxHp = maxHp;
             currentHp = maxHp;
 
-            this.position = position;
+            // copy the position
+            this.position[0] = position[0];
+            this.position[1] = position[1];
 
-            this.damage = damage;
+            // copy the damage
+            this.damage[0] = damage[0];
+            this.damage[1] = damage[1];
 
             this.xpNecUp = xpNecUp;
 
@@ -68,6 +72,12 @@ namespace Server.Game
             position[0] = x;
             position[1] = y;
             Console.WriteLine(InSceneIndex);
+        }
+
+        internal void Transfer(Scene oldScene, Scene nextScene) {
+            oldScene.RemovePlayerFromScene(this);
+            nextScene.AddplayerToScene(this);
+            this.scene = nextScene;
         }
 
         internal void CheckMove(int x, int y)

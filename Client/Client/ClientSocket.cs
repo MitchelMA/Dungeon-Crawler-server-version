@@ -28,8 +28,11 @@ namespace Client.Client
             client.Connect(remoteEp);
 
             Console.WriteLine($"Connected to server: {remoteEp.Address}:{remoteEp.Port}");
-            string data = GetMessage();
-            Console.WriteLine(data);
+            while (true)
+            {
+                string data = GetMessage();
+                Console.WriteLine(data);
+            }
         }
 
         internal string GetMessage()
@@ -54,7 +57,7 @@ namespace Client.Client
         {
             int len = Encoding.UTF8.GetByteCount(message);
             string messageLength = len.ToString();
-            for(int i = len.ToString().Length; i< header; i++)
+            for (int i = len.ToString().Length; i < header; i++)
             {
                 messageLength += " ";
             }
