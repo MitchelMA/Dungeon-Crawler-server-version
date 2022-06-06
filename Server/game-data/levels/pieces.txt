@@ -1,0 +1,8 @@
+┌ is een hoek
+┐ is ook een hoek
+┘ is ook een hoek
+└ is ook een hoek
+─ is een bovenmuur
+│ is een zijmuur
+· loopbare achtergrond
+! is de "flag" dit is een punt waar je heen moet om te winnen

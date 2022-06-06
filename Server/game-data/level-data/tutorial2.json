@@ -1,0 +1,53 @@
+{
+    "name": "Tutorial Level 2",
+    "begin-position": [36, 2],
+    "width": 39,
+    "doors": [
+        {
+            "position": [37, 2],
+            "dest-position": [4, 19],
+            "dest-name": "Tutorial Level"
+        }
+    ],
+    "monsters":[
+        {
+            "difficulty": "tutorial-boss",
+            "position": [5, 5]
+        },
+        {
+            "difficulty": "tutorial-boss",
+            "position": [6, 5]
+        },
+        {
+            "difficulty": "tutorial-boss",
+            "position": [6, 6]
+        },
+        {
+            "difficulty": "tutorial-boss",
+            "position": [5, 4]
+        },
+        {
+            "difficulty": "tutorial-boss",
+            "position": [6, 4]
+        },
+        {
+            "difficulty": "tutorial-boss",
+            "position": [7, 4]
+        },
+        {
+            "difficulty": "tutorial-boss",
+            "position": [7, 5]
+        },
+        {
+            "difficulty": "tutorial-boss",
+            "position": [7, 6]
+        }
+    ],
+    "traps": {
+        "groep2": [
+            [22, 4],
+            [22, 5],
+            [22, 6]
+        ]
+    }
+}

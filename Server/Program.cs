@@ -1,12 +1,16 @@
 ﻿using System;
+using Server.Game.DataStructures;
+using Shared;
 
 namespace Server
 {
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            // try to parse a scene
+            SceneStructure mySceneStruct = Serializer.Deserialize<SceneStructure>(@"game-data\level-data\tutorial.json");
+            Console.WriteLine(mySceneStruct.Name);
         }
     }
 }

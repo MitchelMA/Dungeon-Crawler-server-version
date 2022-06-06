@@ -1,0 +1,191 @@
+{
+    "name": "Tutorial Level",
+    "begin-position": [1, 2],
+    "width": 35,
+    "doors": [
+        {
+            "position": [14, 2],
+            "dest-position": [17, 7],
+            "dest-name": "Tutorial Level"
+        },
+        {
+            "position": [16, 7],
+            "dest-position": [13, 2],
+            "dest-name": "Tutorial Level"
+        },
+        {
+            "position": [32, 9],
+            "dest-position": [19, 13],
+            "dest-name": "Tutorial Level"
+        },
+        {
+            "position": [19, 12],
+            "dest-position": [32, 8],
+            "dest-name": "Tutorial Level"
+        },
+        {
+            "position": [3, 19],
+            "dest-position": [36, 2],
+            "dest-name": "Tutorial Level 2"
+        }
+    ],
+    "monsters": [
+        {
+            "difficulty": "tutorial",
+            "position": [20, 6]
+        },
+        {
+            "difficulty": "tutorial",
+            "position": [20, 8]
+        },
+        {
+            "difficulty": "tutorial",
+            "position": [22, 6]
+        },
+        {
+            "difficulty": "tutorial",
+            "position": [22, 8]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [32, 8]
+        },
+        {
+            "Difficulty": "tutorial-medium",
+            "position": [31, 8]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [32, 7]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [17, 13]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [21, 13]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [16, 14]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [22, 14]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [16, 15]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [22, 15]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "Position": [16, 16]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [22, 16]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [17, 17]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [21, 17]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [18, 18]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [19, 18]
+        },
+        {
+            "difficulty": "tutorial-medium",
+            "position": [20, 18]
+        }
+    ],
+    "healing-bottles": [
+        {
+            "size": "small",
+            "position": [17, 6]
+        },
+        {
+            "size":"small",
+            "position": [17, 8]
+        },
+        {
+            "size": "medium",
+            "position": [18, 6]
+        },
+        {
+            "size": "medium",
+            "position": [18, 8]
+        },
+        {
+            "size": "medium",
+            "position": [32, 13]
+        },
+        {
+            "size": "medium",
+            "position": [31, 13]
+        },
+        {
+            "size": "medium",
+            "position": [7, 13]
+        },
+        {
+            "size": "medium",
+            "position": [6, 13]
+        },
+        {
+            "size": "medium",
+            "position": [32, 14]
+        },
+        {
+            "size": "medium",
+            "position": [6, 14]
+        },
+        {
+            "size": "medium",
+            "position": [32, 15]
+        },
+        {
+            "size": "medium",
+            "position": [31, 15]
+        },
+        {
+            "size": "medium",
+            "position": [7, 15]
+        },
+        {
+            "size": "medium",
+            "position": [6, 15]
+        }
+    ],
+    "experience-bottles": [
+        {
+            "size": "small",
+            "position": [32, 6]
+        },
+        {
+            "size": "medium",
+            "position": [7, 14]
+        },
+        {
+            "size": "medium",
+            "position": [31, 14]
+        }
+    ],
+    "traps": {
+        "groep1": [
+            [10, 19]
+        ]
+    }
+}

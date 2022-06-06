@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,5 +8,16 @@
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+	  <!-- Copy's the whole `game-data` directory and all its content -->
+	  <Content Include="game-data\**">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  
+    <Folder Include="Server\" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties game-data_4reference_1json__JsonSchema="https://beaujs.com/schema.json" /></VisualStudio></ProjectExtensions>
 
 </Project>

@@ -1,0 +1,12 @@
+﻿{
+    "includes": [
+        {
+            "level-path": "./levels/tutorial.txt",
+            "level-data": "./level-data/tutorial.json"
+        },
+        {
+            "level-path": "./levels/tutorial2.txt",
+            "level-data": "./level-data/tutorial2.json"
+        }
+    ]
+}
