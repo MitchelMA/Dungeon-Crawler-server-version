@@ -16,9 +16,9 @@ namespace Server.Game.DataStructures
         [JsonPropertyName("monsters")]
         public MonsterStructure[] Monsters { get; set; }
         [JsonPropertyName("healing-bottles")]
-        public HealingBottleStructure[] HealingBottles { get; set; }
+        public BottleStructure[] HealingBottles { get; set; }
         [JsonPropertyName("experience-bottles")]
-        public ExperienceBottleStructure[] ExperienceBottles { get; set; }
+        public BottleStructure[] ExperienceBottles { get; set; }
         [JsonPropertyName("traps")]
         public Dictionary<string, int[][]> Traps { get; set; }
     }

@@ -14,10 +14,8 @@
 	  <Content Include="game-data\**">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
-	  
-    <Folder Include="Server\" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties game-data_4reference_1json__JsonSchema="https://beaujs.com/schema.json" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>

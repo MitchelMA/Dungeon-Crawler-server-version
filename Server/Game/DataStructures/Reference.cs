@@ -4,15 +4,13 @@ namespace Server.Game.DataStructures
 {
     internal class Reference
     {
-        public Include[] Includes { get; set; }
-    }
-
-    internal class Include
-    {
+        [JsonPropertyName("level-data-path")]
+        public string LevelDataPath { get; set; }
         [JsonPropertyName("level-path")]
         public string LevelPath { get; set; }
-
-        [JsonPropertyName("level-data")]
-        public string LevelData { get; set; }
+        [JsonPropertyName("item-data-path")]
+        public string ItemDataPath { get; set; }
+        [JsonPropertyName("levels")]
+        public string[] Levels { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Server.Game.DataStructures
 {
-    internal class ExperienceBottleStructure
+    internal class BottleStructure
     {
         [JsonPropertyName("size")]
         public string Size { get; set; }

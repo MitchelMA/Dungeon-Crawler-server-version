@@ -8,5 +8,6 @@ namespace Server.Game.Items
 {
     internal class ExperienceBottle : AItem
     {
+        private static Dictionary<string, int> valueTable = new Dictionary<string, int>();
     }
 }
