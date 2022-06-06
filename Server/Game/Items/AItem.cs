@@ -12,5 +12,14 @@ namespace Server.Game.Items
     /// </summary>
     internal abstract class AItem
     {
+        internal int[] position = new int[2];
+        internal int positionIndex;
+        protected abstract void Interact();
+        
+        internal AItem(int[] position, int sceneWidth)
+        {
+            this.position = position;
+            positionIndex = this.position[1] * sceneWidth + this.position[1] + this.position[0];
+        }
     }
 }

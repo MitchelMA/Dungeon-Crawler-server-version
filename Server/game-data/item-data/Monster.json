@@ -1,14 +1,14 @@
 {
     "tutorial": {
-        "HP": 20,
-        "Damage": [2, 5]
+        "hp": 20,
+        "damage": [2, 5]
     },
     "tutorial-medium": {
-        "HP": 35,
-        "Damage": [5, 8]
+        "hp": 35,
+        "damage": [5, 8]
     },
     "tutorial-boss": {
-        "HP": 100,
-        "Damage": [22, 27]
+        "hp": 100,
+        "damage": [22, 27]
     }
 }

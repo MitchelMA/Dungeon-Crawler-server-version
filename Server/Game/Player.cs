@@ -8,5 +8,6 @@ namespace Server.Game
 {
     internal class Player
     {
+
     }
 }

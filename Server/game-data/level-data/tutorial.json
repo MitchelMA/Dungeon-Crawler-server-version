@@ -51,7 +51,7 @@
             "position": [32, 8]
         },
         {
-            "Difficulty": "tutorial-medium",
+            "difficulty": "tutorial-medium",
             "position": [31, 8]
         },
         {
@@ -84,7 +84,7 @@
         },
         {
             "difficulty": "tutorial-medium",
-            "Position": [16, 16]
+            "position": [16, 16]
         },
         {
             "difficulty": "tutorial-medium",

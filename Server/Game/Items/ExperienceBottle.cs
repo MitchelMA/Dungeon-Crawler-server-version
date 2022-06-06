@@ -8,6 +8,16 @@ namespace Server.Game.Items
 {
     internal class ExperienceBottle : AItem
     {
-        private static Dictionary<string, int> valueTable = new Dictionary<string, int>();
+        internal string size;
+
+        internal ExperienceBottle(int[] position, string size, Dictionary<string, int> dataTable, int sceneWidth) : base(position, sceneWidth)
+        {
+            this.size = size;
+        }
+
+        protected override void Interact()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
