@@ -11,6 +11,7 @@ namespace Server
         {
             // create a socket
             ServerSocket socket = new ServerSocket("localhost", 5500, false);
+            socket.Start();
         }
     }
 }

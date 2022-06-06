@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Server.Game;
 
@@ -19,8 +20,9 @@ namespace Server.Game
         internal int currentLvl = 1;
 
         internal Scene scene;
+        internal Socket socket;
 
-        internal Player(int maxHp, int[] position, int[] damage, int xpNecUp, Scene scene)
+        internal Player(int maxHp, int[] position, int[] damage, int xpNecUp, Scene scene, Socket socket)
         {
             this.maxHp = maxHp;
             currentHp = maxHp;
@@ -32,6 +34,8 @@ namespace Server.Game
             this.xpNecUp = xpNecUp;
 
             this.scene = scene;
+
+            this.socket = socket;
         }
 
         internal void XpUp(int amount)
@@ -72,6 +76,14 @@ namespace Server.Game
             int[] listen;
             switch(scene.GameField[nextPos])
             {
+                case '─':
+                case '│':
+                case '┌':
+                case '┐':
+                case '┘':
+                case '└':
+                case '#':
+                    break;
                 default:
                     break;
             }

@@ -16,7 +16,7 @@ namespace Server.Game
         // generic scene info
         private string gameField;
         internal string name;
-        private int[] beginPosition;
+        internal readonly int[] beginPosition;
         internal int width;
 
         // paths to item-data
@@ -156,6 +156,28 @@ namespace Server.Game
             byte[] bytes = new byte[f.Length];
             f.Read(bytes);
             gameField = Encoding.UTF8.GetString(bytes);
+        }
+        /// <summary>
+        /// Adds a player to this scene
+        /// </summary>
+        /// <param name="player">The player that gets added to the list of players</param>
+        /// <returns>A boolean determining if it was added or not</returns>
+        internal bool AddplayerToScene(Player player)
+        {
+            // make sure no doubles end up in the list of players
+            if (players.Contains(player))
+                return false;
+            players.Add(player);
+            return true;
+        }
+        /// <summary>
+        /// Removes a player from this scene
+        /// </summary>
+        /// <param name="player">The player that gets removed from the scene</param>
+        /// <returns>A boolean determining if it was removed</returns>
+        internal bool RemovePlayerFromScene(Player player)
+        {
+            return players.Remove(player);
         }
     }
 }
