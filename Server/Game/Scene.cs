@@ -168,7 +168,11 @@ namespace Server.Game
         /// Adds a player to this scene
         /// </summary>
         /// <param name="player">The player that gets added to the list of players</param>
-        /// <returns>A boolean determining if it was added or not</returns>
+        /// <returns>A boolean determining if it was added or not: <br/>
+        /// <b>True</b> - when the player was added <br/>
+        /// <b>False</b> - when the player wasn't added, this could be because <br/>
+        /// the player was already in this scene
+        /// </returns>
         internal bool AddplayerToScene(Player player)
         {
             // make sure no doubles end up in the list of players
@@ -181,7 +185,9 @@ namespace Server.Game
         /// Removes a player from this scene
         /// </summary>
         /// <param name="player">The player that gets removed from the scene</param>
-        /// <returns>A boolean determining if it was removed</returns>
+        /// <returns>A boolean determining if it was removed:<br/>
+        /// <b>True</b> - when the player was succesfully removed <br/>
+        /// <b>False</b> - when the player wasn't removed</returns>
         internal bool RemovePlayerFromScene(Player player)
         {
             return players.Remove(player);
@@ -217,7 +223,7 @@ namespace Server.Game
         }
 
         /// <summary>
-        /// Updates the status of this scene. </br>
+        /// Updates the status of this scene. <br/>
         /// Detecting which players disconnected and removing them
         /// </summary>
         /// <returns>Returns a list containing all the players in this scene who disconnected</returns>

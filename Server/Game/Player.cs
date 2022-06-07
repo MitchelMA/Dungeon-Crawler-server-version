@@ -74,10 +74,15 @@ namespace Server.Game
             Console.WriteLine(InSceneIndex);
         }
 
-        internal void Transfer(Scene oldScene, Scene nextScene) {
-            oldScene.RemovePlayerFromScene(this);
-            nextScene.AddplayerToScene(this);
-            this.scene = nextScene;
+        internal void Transfer(Scene oldScene, Scene nextScene)
+        {
+            // If the player was already present in the next scene,
+            // do nothing
+            if (nextScene.AddplayerToScene(this))
+            {
+                oldScene.RemovePlayerFromScene(this);
+                scene = nextScene;
+            }
         }
     }
 }

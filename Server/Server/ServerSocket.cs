@@ -191,8 +191,8 @@ namespace Server.Server
         }
 
         /// <summary>
-        /// Updates the players in the scene.</br>
-        /// This method also removes all the disconnected players. </br>
+        /// Updates the players in the scene.<br/>
+        /// This method also removes all the disconnected players. <br/>
         /// Because of this, this is the safe way to update all the players in a specific scene.
         /// </summary>
         /// <param name="scene">The scene's players you want to update</param>
@@ -239,6 +239,14 @@ namespace Server.Server
                 }
             }
         }
+        /// <summary>
+        /// Add an instance of a Player class to the list of players on the server
+        /// </summary>
+        /// <param name="player">The player you want to add to the server</param>
+        /// <returns>A boolean determining if the player was added or not:<br/>
+        /// <b>True</b> - when the player was succesfully added to the list of players. <br/>
+        /// <b>False</b> - when the player wasn't added, this could be, because the player was already on the server
+        /// </returns>
         private bool AddPlayer(Player player)
         {
             if (players.Contains(player))
