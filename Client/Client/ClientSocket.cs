@@ -31,7 +31,7 @@ namespace Client.Client
         {
             try
             {
-                return client.Poll(0, SelectMode.SelectRead);
+                return client.Poll(1000, SelectMode.SelectRead);
             }
             catch
             {
@@ -49,9 +49,9 @@ namespace Client.Client
             {
                 if (TryConnection())
                 {
-                    Console.WriteLine("Disconnected from the server");
+                    Console.WriteLine("Disconnected from the server: Polling took too long");
                     StopInput = true;
-                    break;
+                    //break;
                 }
                 try
                 {
@@ -124,6 +124,11 @@ namespace Client.Client
                         break;
                     case ConsoleKey.Q:
                         client.Dispose();
+                        Environment.Exit(0);
+                        break;
+                    case ConsoleKey.Escape:
+                        client.Dispose();
+                        Environment.Exit(0);
                         break;
 
                     default:

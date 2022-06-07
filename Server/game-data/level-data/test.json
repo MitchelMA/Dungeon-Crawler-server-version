@@ -1,0 +1,12 @@
+{
+    "name": "Test level",
+    "begin-position": [ 1, 1 ],
+    "width": 8,
+    "doors": [
+        {
+            "position": [ 0, 1 ],
+            "dest-position": [ 1, 2 ],
+            "dest-name": "Tutorial Level"
+        }
+    ]
+}

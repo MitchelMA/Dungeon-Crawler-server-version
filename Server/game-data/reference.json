@@ -3,6 +3,7 @@
     "level-path": ".\\levels\\",
     "item-data-path":  ".\\item-data\\",
     "levels": [
+        "test",
         "tutorial",
         "tutorial2"
     ]

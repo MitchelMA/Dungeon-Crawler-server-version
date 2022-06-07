@@ -79,24 +79,5 @@ namespace Server.Game
             nextScene.AddplayerToScene(this);
             this.scene = nextScene;
         }
-
-        internal void CheckMove(int x, int y)
-        {
-            int nextPos = (position[1] + y) * scene.width + position[1] + y + position[0] + x;
-            int[] listen;
-            switch(scene.GameField[nextPos])
-            {
-                case '─':
-                case '│':
-                case '┌':
-                case '┐':
-                case '┘':
-                case '└':
-                case '#':
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 }

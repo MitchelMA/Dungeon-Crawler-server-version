@@ -229,7 +229,7 @@ namespace Server.Game
             {
                 try
                 {
-                    bool connected = player.socket.Poll(0, System.Net.Sockets.SelectMode.SelectRead);
+                    bool connected = player.socket.Poll(1000, System.Net.Sockets.SelectMode.SelectRead);
                     if (connected)
                     {
                         Console.WriteLine("Disconnection found");
@@ -239,9 +239,10 @@ namespace Server.Game
                 }
                 catch(Exception e)
                 {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
                     Console.WriteLine("Disconnection found");
                     disconnected.Add(player);
-                    continue;
                 }
             }
             // then remove all the disconnected

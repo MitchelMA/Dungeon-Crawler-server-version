@@ -86,14 +86,6 @@ namespace Server.Server
             first.AddplayerToScene(player);
             AddPlayer(player);
             UpdateStatus(player.scene);
-            try
-            {
-                if (player == players[1])
-                {
-                    players[0].Move(2, 0);
-                }
-            }
-            catch { }
 
             // update the this scene
             UpdatePlayers(player.scene);
@@ -120,16 +112,16 @@ namespace Server.Server
                     switch (input)
                     {
                         case Input.right:
-                            player.Move(1, 0);
+                            CheckMove(1, 0, player);
                             break;
                         case Input.down:
-                            player.Move(0, 1);
+                            CheckMove(0, 1, player);
                             break;
                         case Input.left:
-                            player.Move(-1, 0);
+                            CheckMove(-1, 0, player);
                             break;
                         case Input.up:
-                            player.Move(0, -1);
+                            CheckMove(0, -1, player);
                             break;
                         case Input.quit:
                             player.socket.Dispose();
@@ -255,6 +247,27 @@ namespace Server.Server
             }
             players.Add(player);
             return true;
+        }
+
+        private void CheckMove(int x, int y, Player player)
+        {
+            Scene playerScene = player.scene;
+            int[] playerPos = player.position;
+            int nextPos = (playerPos[1] + y) * playerScene.width + playerPos[1] + y + playerPos[0] + x;
+            int[] listen;
+            switch (playerScene.GameField[nextPos])
+            {
+                case '─':
+                case '│':
+                case '┌':
+                case '┐':
+                case '┘':
+                case '└':
+                case '#':
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
