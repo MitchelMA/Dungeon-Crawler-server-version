@@ -15,6 +15,7 @@ namespace Shared
         down,
         left,
         up,
-        quit
+        quit,
+        ignore
     }
 }

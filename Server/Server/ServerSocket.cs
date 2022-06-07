@@ -15,7 +15,7 @@ namespace Server.Server
 {
     internal class ServerSocket
     {
-        
+
         private readonly Socket listener;
         private List<Player> players;
         private Dictionary<string, Scene> scenes;
@@ -43,7 +43,7 @@ namespace Server.Server
         private void GameSetup()
         {
             gameReference = Serializer.Deserialize<Reference>(@"game-data\reference.json");
-            foreach(string name in gameReference.Levels)
+            foreach (string name in gameReference.Levels)
             {
                 Scene scene = new Scene(gameReference, name);
                 scenes.Add(scene.name, scene);
@@ -66,7 +66,7 @@ namespace Server.Server
         private void ListenForClients()
         {
             Console.WriteLine($"[Listening]: Server started listening on: {endPoint.Address}:{endPoint.Port}");
-            while(true)
+            while (true)
             {
                 Socket client = listener.Accept();
                 Console.WriteLine($"[New Connection]: {client.RemoteEndPoint}");
@@ -102,7 +102,7 @@ namespace Server.Server
 
         private void GameLoop(Player player)
         {
-            while(true)
+            while (true)
             {
                 UpdateStatus(player.scene);
                 if (!players.Contains(player))
@@ -113,21 +113,53 @@ namespace Server.Server
                 // wait for user input
                 try
                 {
+                    // try to parse the input data to the input Enum
                     string data = GetMessage(player.socket);
                     Input input = (Input)Enum.Parse(typeof(Input), data);
                     Console.WriteLine(input);
+                    switch (input)
+                    {
+                        case Input.right:
+                            player.Move(1, 0);
+                            break;
+                        case Input.down:
+                            player.Move(0, 1);
+                            break;
+                        case Input.left:
+                            player.Move(-1, 0);
+                            break;
+                        case Input.up:
+                            player.Move(0, -1);
+                            break;
+                        case Input.quit:
+                            player.socket.Dispose();
+                            break;
+                        case Input.ignore:
+                            continue;
+                        default:
+                            break;
+                    }
+                    UpdatePlayers(player.scene);
                 }
-                catch(Exception e)
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("Kon input niet parsen naar Enum typeof Input");
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
+                catch (Exception e)
                 {
                     Console.WriteLine("Er ging iets mis met de verbinding");
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
-                    player.socket.Shutdown(SocketShutdown.Both);
-                    UpdateStatus(player.scene);
+                    // shutdown the connection of this player
+                    // and update all the other players
                     UpdatePlayers(player.scene);
+
+                    // end the loop 
                     break;
                 }
-                
+
             }
 
         }
@@ -138,7 +170,7 @@ namespace Server.Server
             byte[] bytes = new byte[header];
 
             int bytesRec = client.Receive(bytes);
-            if(bytesRec > 0)
+            if (bytesRec > 0)
             {
                 int messageSize = Convert.ToInt32(Encoding.UTF8.GetString(bytes, 0, bytesRec));
                 bytes = new byte[messageSize];
@@ -156,7 +188,7 @@ namespace Server.Server
 
             int len = Encoding.UTF8.GetByteCount(message);
             messageLength = len.ToString();
-            for(int i = len.ToString().Length; i < header; i++)
+            for (int i = len.ToString().Length; i < header; i++)
             {
                 messageLength += " ";
             }
@@ -176,15 +208,15 @@ namespace Server.Server
         {
             List<Player> disconnected = scene.Update();
             Console.WriteLine("Disconnected count: " + disconnected.Count);
-            
-            foreach(Player disconnect in disconnected)
+
+            foreach (Player disconnect in disconnected)
             {
                 players.Remove(disconnect);
                 try
                 {
                     disconnect.socket.Shutdown(SocketShutdown.Both);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine("Failed to disconnect socket: socket was most likely already disconnected");
                     Console.WriteLine(e.Message);
@@ -200,7 +232,7 @@ namespace Server.Server
         {
             List<Player> disconnected = scene.UpdateStatus();
             Console.WriteLine("Disconnected count: " + disconnected.Count);
-            foreach(Player disconnect in disconnected)
+            foreach (Player disconnect in disconnected)
             {
                 players.Remove(disconnect);
                 try
@@ -217,7 +249,7 @@ namespace Server.Server
         }
         private bool AddPlayer(Player player)
         {
-            if(players.Contains(player))
+            if (players.Contains(player))
             {
                 return false;
             }

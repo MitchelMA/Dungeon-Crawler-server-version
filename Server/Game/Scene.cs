@@ -227,8 +227,17 @@ namespace Server.Game
             // first, check for disconnected
             foreach (Player player in players)
             {
-                bool connected = player.socket.Poll(50, System.Net.Sockets.SelectMode.SelectRead);
-                if (connected)
+                try
+                {
+                    bool connected = player.socket.Poll(0, System.Net.Sockets.SelectMode.SelectRead);
+                    if (connected)
+                    {
+                        Console.WriteLine("Disconnection found");
+                        disconnected.Add(player);
+                        continue;
+                    }
+                }
+                catch(Exception e)
                 {
                     Console.WriteLine("Disconnection found");
                     disconnected.Add(player);

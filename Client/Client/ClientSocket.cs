@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using Shared;
 
 namespace Client.Client
 {
@@ -26,6 +27,19 @@ namespace Client.Client
             client = new Socket(iPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         }
 
+        private bool TryConnection()
+        {
+            try
+            {
+                return client.Poll(0, SelectMode.SelectRead);
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
         internal void Start()
         {
             client.Connect(remoteEp);
@@ -33,7 +47,7 @@ namespace Client.Client
             Console.WriteLine($"Connected to server: {remoteEp.Address}:{remoteEp.Port}");
             while (true)
             {
-                if (!client.Connected)
+                if (TryConnection())
                 {
                     Console.WriteLine("Disconnected from the server");
                     StopInput = true;
@@ -43,19 +57,21 @@ namespace Client.Client
                 {
                     Console.WriteLine(client.Connected);
                     string data = GetMessage();
-                    if(data != null)
+                    if (data != null)
                     {
+                        Console.Clear();
                         Console.WriteLine(data);
                         // after the first message, 
                         // the input loop may start
                         InitiateInput();
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine("Er ging iets mis met de verbinding");
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
+                    client.Shutdown(SocketShutdown.Both);
                     StopInput = true;
                     break;
                 }
@@ -68,7 +84,7 @@ namespace Client.Client
         /// </summary>
         private void InitiateInput()
         {
-            if(startedInput)
+            if (startedInput)
             {
                 return;
             }
@@ -81,7 +97,7 @@ namespace Client.Client
 
         private void InputLoop()
         {
-            while(true)
+            while (true)
             {
                 if (StopInput)
                 {
@@ -91,8 +107,32 @@ namespace Client.Client
                 }
 
                 // wait for user input
-                string input = Console.ReadLine();
-                SendMessage(input);
+                ConsoleKey input = Console.ReadKey().Key;
+                switch (input)
+                {
+                    case ConsoleKey.UpArrow:
+                        SendMessage(Enum.GetName(typeof(Input), Input.up));
+                        break;
+                    case ConsoleKey.RightArrow:
+                        SendMessage(Enum.GetName(typeof(Input), Input.right));
+                        break;
+                    case ConsoleKey.DownArrow:
+                        SendMessage(Enum.GetName(typeof(Input), Input.down));
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        SendMessage(Enum.GetName(typeof(Input), Input.left));
+                        break;
+                    case ConsoleKey.Q:
+                        client.Dispose();
+                        break;
+
+                    default:
+                        SendMessage(Enum.GetName(typeof(Input), Input.ignore));
+                        break;
+                }
+                // sleep at least this amount
+                // otherwise the server could get overloaded and in turn no client can poll the server, disconnecting all of them
+                Thread.Sleep(50);
             }
         }
 
