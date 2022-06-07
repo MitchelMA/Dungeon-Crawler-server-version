@@ -188,7 +188,7 @@ namespace Server.Game
         }
 
         /// <summary>
-        /// Sends the GameField to all connected players
+        /// Sends the GameField to all the players in this scene
         /// </summary>
         /// <returns>A list of players who got disconnected</returns>
         internal List<Player> Update()
@@ -210,7 +210,7 @@ namespace Server.Game
         /// Updates the status of this scene. </br>
         /// Detecting which players disconnected and removing them
         /// </summary>
-        /// <returns>Returns a list containing all the players who disconnected</returns>
+        /// <returns>Returns a list containing all the players in this scene who disconnected</returns>
         internal List<Player> UpdateStatus()
         {
             List<Player> disconnected = new List<Player>();

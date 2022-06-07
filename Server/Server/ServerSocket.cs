@@ -15,6 +15,7 @@ namespace Server.Server
 {
     internal class ServerSocket
     {
+        
         private readonly Socket listener;
         private List<Player> players;
         private Dictionary<string, Scene> scenes;
@@ -101,9 +102,33 @@ namespace Server.Server
 
         private void GameLoop(Player player)
         {
-            Console.WriteLine(players.Count);
-            //Scene currentScene = player.scene;
-            //SendMessage(player.socket, currentScene.GameField);
+            while(true)
+            {
+                UpdateStatus(player.scene);
+                if (!players.Contains(player))
+                {
+                    UpdatePlayers(player.scene);
+                    break;
+                }
+                // wait for user input
+                try
+                {
+                    string data = GetMessage(player.socket);
+                    Input input = (Input)Enum.Parse(typeof(Input), data);
+                    Console.WriteLine(input);
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Er ging iets mis met de verbinding");
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                    player.socket.Shutdown(SocketShutdown.Both);
+                    UpdatePlayers(player.scene);
+                    break;
+                }
+                
+            }
+
         }
 
         internal static string GetMessage(Socket client)
@@ -135,8 +160,6 @@ namespace Server.Server
                 messageLength += " ";
             }
 
-            Console.WriteLine(Encoding.UTF8.GetByteCount(message));
-
             // send the length of the message and the message respectively
             client.Send(Encoding.UTF8.GetBytes(messageLength));
             client.Send(Encoding.UTF8.GetBytes(message));
@@ -156,6 +179,16 @@ namespace Server.Server
             foreach(Player disconnect in disconnected)
             {
                 players.Remove(disconnect);
+                try
+                {
+                    disconnect.socket.Shutdown(SocketShutdown.Both);
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Failed to disconnect socket: socket was most likely already disconnected");
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
             }
         }
         /// <summary>
@@ -169,6 +202,16 @@ namespace Server.Server
             foreach(Player disconnect in disconnected)
             {
                 players.Remove(disconnect);
+                try
+                {
+                    disconnect.socket.Shutdown(SocketShutdown.Both);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Failed to disconnect socket: socket was most likely already disconnected");
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
             }
         }
         private bool AddPlayer(Player player)
