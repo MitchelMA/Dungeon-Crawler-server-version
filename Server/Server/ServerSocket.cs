@@ -123,6 +123,7 @@ namespace Server.Server
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
                     player.socket.Shutdown(SocketShutdown.Both);
+                    UpdateStatus(player.scene);
                     UpdatePlayers(player.scene);
                     break;
                 }

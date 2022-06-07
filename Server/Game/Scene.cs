@@ -200,7 +200,17 @@ namespace Server.Game
             // only update the connected players
             foreach (Player player in players)
             {
-                ServerSocket.SendMessage(player.socket, GameField);
+                // don't send any messages to disconnected players
+                try
+                {
+                    ServerSocket.SendMessage(player.socket, GameField);
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Failed to update player");
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
             }
             // at the end, return all the disconnected, so the server knows which one to clean up
             return disconnected;
