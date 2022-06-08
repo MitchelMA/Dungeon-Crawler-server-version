@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using Server.Game;
+using Server.Game.Items;
 using Server.Game.DataStructures;
 using Shared;
 
@@ -113,15 +114,19 @@ namespace Server.Server
                     {
                         case Input.right:
                             CheckMove(1, 0, player);
+                            //player.Move(1, 0);
                             break;
                         case Input.down:
                             CheckMove(0, 1, player);
+                            //player.Move(0, 1);
                             break;
                         case Input.left:
                             CheckMove(-1, 0, player);
+                            //player.Move(-1, 0);
                             break;
                         case Input.up:
                             CheckMove(0, -1, player);
+                            //player.Move(0, -1);
                             break;
                         case Input.quit:
                             player.socket.Dispose();
@@ -139,17 +144,32 @@ namespace Server.Server
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
                 }
-                catch (Exception e)
+                catch (SocketException e)
                 {
-                    Console.WriteLine("Er ging iets mis met de verbinding");
+                    Console.WriteLine("Er ging iets mis tijdens de verbinding:");
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
-                    // shutdown the connection of this player
                     // and update all the other players
                     UpdatePlayers(player.scene);
-
-                    // end the loop 
+                    // break this loop to end the connection on the client's side
                     break;
+                }
+                catch (ObjectDisposedException e)
+                {
+                    Console.WriteLine("Er ging iets mis tijdens de verbinding:");
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                    // and update all the other players
+                    UpdatePlayers(player.scene);
+                    // break this loop to end the connection on the client's side
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Er ging iets mis:");
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                    
                 }
 
             }
@@ -262,7 +282,6 @@ namespace Server.Server
             Scene playerScene = player.scene;
             int[] playerPos = player.position;
             int nextPos = (playerPos[1] + y) * playerScene.width + playerPos[1] + y + playerPos[0] + x;
-            int[] listen;
             switch (playerScene.GameField[nextPos])
             {
                 case '─':
@@ -273,7 +292,14 @@ namespace Server.Server
                 case '└':
                 case '#':
                     break;
+
+                // item cases
+                case '$':
+                    Door.CheckForPlayer(player, scenes, x, y);
+
+                    break;
                 default:
+                    player.Move(x, y);
                     break;
             }
         }

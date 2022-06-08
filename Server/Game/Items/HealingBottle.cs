@@ -15,7 +15,7 @@ namespace Server.Game.Items
             this.size = size;
         }
 
-        protected override void Interact()
+        protected override void Interact(Player player)
         {
             throw new NotImplementedException();
         }

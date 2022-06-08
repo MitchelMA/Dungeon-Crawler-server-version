@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.Game.Items
 {
@@ -14,8 +10,13 @@ namespace Server.Game.Items
     {
         internal int[] position = new int[2];
         internal int positionIndex;
-        protected abstract void Interact();
-        
+        protected abstract void Interact(Player player);
+
+        internal static void CheckForPlayer(Player player, int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
         internal AItem(int[] position, int sceneWidth)
         {
             // DO NOT TAKE OVER THE MEMORY ADDRES

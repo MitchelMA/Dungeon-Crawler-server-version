@@ -17,7 +17,7 @@ namespace Server.Game.Items
             activated = false;
         }
 
-        protected override void Interact()
+        protected override void Interact(Player player)
         {
             throw new NotImplementedException();
         }

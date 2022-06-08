@@ -27,11 +27,11 @@ namespace Server.Game
 
         // items in the scene (players count too)
         private List<Player> players;
-        private List<Door> doors;
-        private List<Monster> monsters;
-        private List<HealingBottle> healingBottles;
-        private List<ExperienceBottle> experienceBottles;
-        private Dictionary<string, Trap[]> traps;
+        internal List<Door> doors;
+        internal List<Monster> monsters;
+        internal List<HealingBottle> healingBottles;
+        internal List<ExperienceBottle> experienceBottles;
+        internal Dictionary<string, Trap[]> traps;
 
         internal string GameField
         {

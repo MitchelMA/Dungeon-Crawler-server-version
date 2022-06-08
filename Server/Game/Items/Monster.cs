@@ -16,7 +16,7 @@ namespace Server.Game.Items
             this.difficulty = difficulty;
         }
 
-        protected override void Interact()
+        protected override void Interact(Player player)
         {
             throw new NotImplementedException();
         }

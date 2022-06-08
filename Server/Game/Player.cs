@@ -47,10 +47,11 @@ namespace Server.Game
             currentXp += amount;
             if (currentXp < xpNecUp * currentLvl)
                 return;
+            LvlUp();
             XpUp(0);
         }
 
-        internal void LvlUp()
+        private void LvlUp()
         {
             damage[0] += 5;
             damage[1] += 5;
@@ -81,6 +82,8 @@ namespace Server.Game
             if (nextScene.AddplayerToScene(this))
             {
                 oldScene.RemovePlayerFromScene(this);
+                // update the old scene to refresh all the other players that are still in that scene
+                oldScene.Update();
                 scene = nextScene;
             }
         }
