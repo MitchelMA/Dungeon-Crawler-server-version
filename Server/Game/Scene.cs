@@ -189,6 +189,19 @@ namespace Server.Game
             f.Read(bytes);
             gameField = Encoding.UTF8.GetString(bytes);
         }
+        
+        internal bool RemoveMonster(Monster monster)
+        {
+            return monsters.Remove(monster);
+        }
+        internal bool RemoveExperience(ExperienceBottle bottle)
+        {
+            return experienceBottles.Remove(bottle);
+        }
+        internal bool RemoveHealing(HealingBottle bottle)
+        {
+            return healingBottles.Remove(bottle);
+        }
         /// <summary>
         /// Adds a player to this scene
         /// </summary>

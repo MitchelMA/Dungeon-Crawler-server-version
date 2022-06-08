@@ -96,6 +96,11 @@ namespace Server.Game
             from.TakeDamage(rnd);
         }
 
+        internal void Heal(int amount)
+        {
+            currentHp = Math.Min(maxHp, currentHp + amount);
+        }
+
         internal void Transfer(Scene oldScene, Scene nextScene)
         {
             // If the player was already present in the next scene,

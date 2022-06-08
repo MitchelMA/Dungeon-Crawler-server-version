@@ -294,9 +294,21 @@ namespace Server.Server
                     break;
 
                 // item cases
+                // Door-case
                 case '$':
                     Door.CheckForPlayer(player, scenes, x, y);
-
+                    break;
+                // Monster case
+                case '@':
+                    Monster.CheckForPlayer(player, x, y);
+                    break;
+                // HealingBottle case
+                case '+':
+                    HealingBottle.CheckForPlayer(player, x, y);
+                    break;
+                // ExperienceBottle case
+                case '&':
+                    ExperienceBottle.CheckForPlayer(player, x, y);
                     break;
                 default:
                     player.Move(x, y);
