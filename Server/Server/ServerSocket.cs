@@ -49,7 +49,7 @@ namespace Server.Server
                 Scene scene = new Scene(gameReference, name);
                 scenes.Add(scene.Name, scene);
             }
-            Console.WriteLine(scenes.First().Value.GameField);
+            //Console.WriteLine(scenes.First().Value.GameField);
         }
 
         internal void Start()
@@ -282,7 +282,7 @@ namespace Server.Server
             Scene playerScene = player.Scene;
             int[] playerPos = player.Position;
             int nextPos = (playerPos[1] + y) * playerScene.Width + playerPos[1] + y + playerPos[0] + x;
-            switch (playerScene.GameField[nextPos])
+            switch (playerScene.GameField(player)[nextPos])
             {
                 case '─':
                 case '│':
@@ -291,6 +291,7 @@ namespace Server.Server
                 case '┘':
                 case '└':
                 case '#':
+                case '?':
                     break;
 
                 // item cases
@@ -309,6 +310,11 @@ namespace Server.Server
                 // ExperienceBottle case
                 case '&':
                     ExperienceBottle.CheckForPlayer(player, x, y);
+                    break;
+                // Trap-activator
+                case '*':
+                    Trap.CheckForPlayer(player, x, y);
+                    player.Move(x * 2, y * 2);
                     break;
                 default:
                     player.Move(x, y);

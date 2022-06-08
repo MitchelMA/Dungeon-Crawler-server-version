@@ -18,6 +18,7 @@ namespace Server.Game
         private int xpNecUp;
         private int currentXp;
         private int currentLvl = 1;
+        private List<Trap> activatedTraps = new List<Trap>();
 
         private Scene scene;
         private readonly Socket socket;
@@ -31,6 +32,7 @@ namespace Server.Game
         internal int XpNecUp { get => xpNecUp; }
         internal int CurrentXp { get => currentXp; }
         internal int CurrentLvl { get => currentLvl; }
+        internal List<Trap> ActivatedTraps { get => new List<Trap>(activatedTraps); }
 
         internal Scene Scene { get => scene; }
         internal Socket Socket { get => socket; }
@@ -99,6 +101,11 @@ namespace Server.Game
         internal void Heal(int amount)
         {
             currentHp = Math.Min(maxHp, currentHp + amount);
+        }
+
+        internal void ActivateTrap(Trap trap)
+        {
+            activatedTraps.Add(trap);
         }
 
         internal void Transfer(Scene oldScene, Scene nextScene)

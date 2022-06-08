@@ -34,56 +34,59 @@ namespace Server.Game
         private Dictionary<string, Trap[]> traps;
 
         // internal Properties of scene info
-        internal string GameField
+        internal string GameField(Player player)
         {
-            get
+            var copy = this.gameField;
+            // draw the doors
+            foreach (Door door in doors)
             {
-                var copy = this.gameField;
-                // draw the doors
-                foreach (Door door in doors)
+                copy = copy.ReplaceAt(door.PositionIndex, 1, "$");
+            }
+            // draw the monsters
+            foreach (Monster monster in monsters)
+            {
+                copy = copy.ReplaceAt(monster.PositionIndex, 1, "@");
+            }
+            // draw the healing bottles
+            foreach (HealingBottle heal in healingBottles)
+            {
+                copy = copy.ReplaceAt(heal.PositionIndex, 1, "+");
+            }
+            // draw the experience bottles
+            foreach (ExperienceBottle experience in experienceBottles)
+            {
+                copy = copy.ReplaceAt(experience.PositionIndex, 1, "&");
+            }
+            // draw the traps
+            foreach (KeyValuePair<string, Trap[]> trapGroup in traps)
+            {
+                foreach (Trap trap in trapGroup.Value)
                 {
-                    copy = copy.ReplaceAt(door.PositionIndex, 1, "$");
-                }
-                // draw the monsters
-                foreach (Monster monster in monsters)
-                {
-                    copy = copy.ReplaceAt(monster.PositionIndex, 1, "@");
-                }
-                // draw the healing bottles
-                foreach (HealingBottle heal in healingBottles)
-                {
-                    copy = copy.ReplaceAt(heal.PositionIndex, 1, "+");
-                }
-                // draw the experience bottles
-                foreach (ExperienceBottle experience in experienceBottles)
-                {
-                    copy = copy.ReplaceAt(experience.PositionIndex, 1, "&");
-                }
-                // draw the traps
-                foreach (KeyValuePair<string, Trap[]> trapGroup in traps)
-                {
-                    foreach (Trap trap in trapGroup.Value)
+                    if (player.ActivatedTraps.Contains(trap))
                     {
-                        if (trap.activated)
-                        {
-                            copy = copy.ReplaceAt(trap.PositionIndex, 1, "#");
-                        }
-                        else
-                        {
-                            copy = copy.ReplaceAt(trap.PositionIndex, 1, "*");
-                        }
+                        copy = copy.ReplaceAt(trap.PositionIndex, 1, "#");
+                    }
+                    else
+                    {
+                        copy = copy.ReplaceAt(trap.PositionIndex, 1, "*");
                     }
                 }
-                // now draw the players on top of everything
-                int index = 0;
-                foreach (Player player in players)
-                {
-                    Console.WriteLine($"index: {index}; player-pos: [{player.Position[0]}, {player.Position[1]}]; addr: {player.Socket.RemoteEndPoint}");
-                    copy = copy.ReplaceAt(player.InSceneIndex, 1, "¶");
-                    index++;
-                }
-                return copy;
             }
+            // now draw the players on top of everything
+            Console.WriteLine($"player-pos: [{player.Position[0]}, {player.Position[1]}]; addr: {player.Socket.RemoteEndPoint}");
+            foreach (Player p in players)
+            {
+                if (p == player)
+                {
+                    copy = copy.ReplaceAt(p.InSceneIndex, 1, "¶");
+                }
+                else
+                {
+                    copy = copy.ReplaceAt(p.InSceneIndex, 1, "?");
+                }
+            }
+            return copy;
+
         }
         internal string Name { get => name; }
         internal int[] BeginPosition { get => new int[2] { beginPosition[0], beginPosition[1] }; }
@@ -95,20 +98,23 @@ namespace Server.Game
         internal List<Monster> Monsters { get => new List<Monster>(monsters); }
         internal List<HealingBottle> HealingBottles { get => new List<HealingBottle>(healingBottles); }
         internal List<ExperienceBottle> ExperienceBottles { get => new List<ExperienceBottle>(experienceBottles); }
-        internal Dictionary<string, Trap[]> Traps { get
+        internal Dictionary<string, Trap[]> Traps
+        {
+            get
             {
                 Dictionary<string, Trap[]> tmp = new();
-                foreach(KeyValuePair<string, Trap[]> pair in traps)
+                foreach (KeyValuePair<string, Trap[]> pair in traps)
                 {
                     List<Trap> traptmp = new();
-                    foreach(Trap trap in pair.Value)
+                    foreach (Trap trap in pair.Value)
                     {
                         traptmp.Add(trap);
                     }
                     tmp.Add(pair.Key, traptmp.ToArray());
                 }
                 return tmp;
-            } }
+            }
+        }
 
         internal Scene(Reference reference, string dataName)
         {
@@ -189,7 +195,7 @@ namespace Server.Game
             f.Read(bytes);
             gameField = Encoding.UTF8.GetString(bytes);
         }
-        
+
         internal bool RemoveMonster(Monster monster)
         {
             return monsters.Remove(monster);
@@ -254,10 +260,10 @@ namespace Server.Game
                     message += $"\nDamage: {player.Damage[0]} - {player.Damage[1]}";
                     message += $"\nHP: {player.CurrentHp}/{player.MaxHp}";
                     message += $"\nXP: {player.CurrentXp}/{player.XpNecUp * player.CurrentLvl}\n";
-                    message += GameField;
+                    message += GameField(player);
                     ServerSocket.SendMessage(player.Socket, message);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine("Failed to update player");
                     Console.WriteLine(e.Message);
@@ -289,7 +295,7 @@ namespace Server.Game
                         continue;
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
