@@ -47,7 +47,7 @@ namespace Server.Server
             foreach (string name in gameReference.Levels)
             {
                 Scene scene = new Scene(gameReference, name);
-                scenes.Add(scene.name, scene);
+                scenes.Add(scene.Name, scene);
             }
             Console.WriteLine(scenes.First().Value.GameField);
         }
@@ -82,14 +82,14 @@ namespace Server.Server
         {
             PlayerStructure playerStructure = Serializer.Deserialize<PlayerStructure>(Path.Combine(@".\game-data\", gameReference.ItemDataPath, @"player.json"));
             Scene first = scenes.First().Value;
-            Player player = new Player(playerStructure.Hp, first.beginPosition, playerStructure.Damage, playerStructure.XpNeededNext, first, client);
+            Player player = new Player(playerStructure.Hp, first.BeginPosition, playerStructure.Damage, playerStructure.XpNeededNext, first, client);
             // add the player to this scene and to the global game
             first.AddplayerToScene(player);
             AddPlayer(player);
-            UpdateStatus(player.scene);
+            UpdateStatus(player.Scene);
 
             // update the this scene
-            UpdatePlayers(player.scene);
+            UpdatePlayers(player.Scene);
             return player;
         }
 
@@ -97,17 +97,17 @@ namespace Server.Server
         {
             while (true)
             {
-                UpdateStatus(player.scene);
+                UpdateStatus(player.Scene);
                 if (!players.Contains(player))
                 {
-                    UpdatePlayers(player.scene);
+                    UpdatePlayers(player.Scene);
                     break;
                 }
                 // wait for user input
                 try
                 {
                     // try to parse the input data to the input Enum
-                    string data = GetMessage(player.socket);
+                    string data = GetMessage(player.Socket);
                     Input input = (Input)Enum.Parse(typeof(Input), data);
                     Console.WriteLine(input);
                     switch (input)
@@ -129,14 +129,14 @@ namespace Server.Server
                             //player.Move(0, -1);
                             break;
                         case Input.quit:
-                            player.socket.Dispose();
+                            player.Socket.Dispose();
                             break;
                         case Input.ignore:
                             continue;
                         default:
                             break;
                     }
-                    UpdatePlayers(player.scene);
+                    UpdatePlayers(player.Scene);
                 }
                 catch (ArgumentException e)
                 {
@@ -150,7 +150,7 @@ namespace Server.Server
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
                     // and update all the other players
-                    UpdatePlayers(player.scene);
+                    UpdatePlayers(player.Scene);
                     // break this loop to end the connection on the client's side
                     break;
                 }
@@ -160,7 +160,7 @@ namespace Server.Server
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
                     // and update all the other players
-                    UpdatePlayers(player.scene);
+                    UpdatePlayers(player.Scene);
                     // break this loop to end the connection on the client's side
                     break;
                 }
@@ -226,7 +226,7 @@ namespace Server.Server
                 players.Remove(disconnect);
                 try
                 {
-                    disconnect.socket.Shutdown(SocketShutdown.Both);
+                    disconnect.Socket.Shutdown(SocketShutdown.Both);
                 }
                 catch (Exception e)
                 {
@@ -249,7 +249,7 @@ namespace Server.Server
                 players.Remove(disconnect);
                 try
                 {
-                    disconnect.socket.Shutdown(SocketShutdown.Both);
+                    disconnect.Socket.Shutdown(SocketShutdown.Both);
                 }
                 catch (Exception e)
                 {
@@ -279,9 +279,9 @@ namespace Server.Server
 
         private void CheckMove(int x, int y, Player player)
         {
-            Scene playerScene = player.scene;
-            int[] playerPos = player.position;
-            int nextPos = (playerPos[1] + y) * playerScene.width + playerPos[1] + y + playerPos[0] + x;
+            Scene playerScene = player.Scene;
+            int[] playerPos = player.Position;
+            int nextPos = (playerPos[1] + y) * playerScene.Width + playerPos[1] + y + playerPos[0] + x;
             switch (playerScene.GameField[nextPos])
             {
                 case '─':

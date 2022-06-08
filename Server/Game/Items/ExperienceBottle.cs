@@ -8,7 +8,9 @@ namespace Server.Game.Items
 {
     internal class ExperienceBottle : AItem
     {
-        internal string size;
+        private string size;
+
+        internal string Size { get => size; }
 
         internal ExperienceBottle(int[] position, string size, Dictionary<string, int> dataTable, int sceneWidth) : base(position, sceneWidth)
         {

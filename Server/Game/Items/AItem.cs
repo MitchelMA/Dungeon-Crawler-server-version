@@ -8,8 +8,11 @@ namespace Server.Game.Items
     /// </summary>
     internal abstract class AItem
     {
-        internal int[] position = new int[2];
-        internal int positionIndex;
+        protected int[] position = new int[2];
+        protected int positionIndex;
+
+        internal int[] Position { get => new int[2] { position[0], position[1] }; }
+        internal int PositionIndex { get => positionIndex; }
         protected abstract void Interact(Player player);
 
         internal static void CheckForPlayer(Player player, int x, int y)

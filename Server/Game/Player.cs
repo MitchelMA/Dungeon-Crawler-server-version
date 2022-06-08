@@ -5,22 +5,36 @@ using System.Text;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Server.Game;
+using Server.Game.Items;
 
 namespace Server.Game
 {
     internal class Player
     {
-        internal int[] position = new int[2];
-        internal int InSceneIndex { get => position[1] * scene.width + position[1] + position[0]; }
-        internal int currentHp;
-        internal int maxHp;
-        internal int[] damage = new int[2];
-        internal int xpNecUp;
-        internal int currentXp;
-        internal int currentLvl = 1;
+        private int[] position = new int[2];
+        private int currentHp;
+        private int maxHp;
+        private int[] damage = new int[2];
+        private int xpNecUp;
+        private int currentXp;
+        private int currentLvl = 1;
 
-        internal Scene scene;
-        internal Socket socket;
+        private Scene scene;
+        private readonly Socket socket;
+
+        // internal Properties for the player info
+        internal int InSceneIndex { get => position[1] * scene.Width + position[1] + position[0]; }
+        internal int[] Position { get => new int[2] { position[0], position[1] }; }
+        internal int CurrentHp { get => currentHp; }
+        internal int MaxHp { get => maxHp; }
+        internal int[] Damage { get => new int[2] { damage[0], damage[1] }; }
+        internal int XpNecUp { get => xpNecUp; }
+        internal int CurrentXp { get => currentXp; }
+        internal int CurrentLvl { get => currentLvl; }
+
+        internal Scene Scene { get => scene; }
+        internal Socket Socket { get => socket; }
+
 
         internal Player(int maxHp, int[] position, int[] damage, int xpNecUp, Scene scene, Socket socket)
         {
@@ -73,6 +87,13 @@ namespace Server.Game
             position[0] = x;
             position[1] = y;
             Console.WriteLine(InSceneIndex);
+        }
+
+        internal void TakeDamage(int amount, Monster from)
+        {
+            currentHp -= amount;
+            int rnd = new Random(DateTime.Now.Millisecond).Next(damage[0], damage[1]+1);
+            from.TakeDamage(rnd);
         }
 
         internal void Transfer(Scene oldScene, Scene nextScene)

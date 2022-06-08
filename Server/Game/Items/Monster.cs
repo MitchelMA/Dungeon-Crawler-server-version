@@ -20,5 +20,22 @@ namespace Server.Game.Items
         {
             throw new NotImplementedException();
         }
+
+        internal void TakeDamage(int amount)
+        {
+
+        }
+
+        new internal static void CheckForPlayer(Player player, int x, int y)
+        {
+            player.Move(x, y);
+            int playerPosIndex = player.InSceneIndex;
+            player.Move(-x, -y);
+
+            foreach(Monster monster in player.Scene.Monsters)
+            {
+
+            }
+        }
     }
 }

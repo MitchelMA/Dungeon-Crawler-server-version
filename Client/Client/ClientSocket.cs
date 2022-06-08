@@ -55,7 +55,6 @@ namespace Client.Client
                 }
                 try
                 {
-                    Console.WriteLine(client.Connected);
                     string data = GetMessage();
                     if (data != null)
                     {

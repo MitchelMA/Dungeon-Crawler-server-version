@@ -16,9 +16,9 @@ namespace Server.Game
     {
         // generic scene info
         private string gameField;
-        internal string name;
-        internal readonly int[] beginPosition;
-        internal int width;
+        private string name;
+        private readonly int[] beginPosition;
+        private int width;
 
         // paths to item-data
         private Dictionary<string, MonsterType> monsterData;
@@ -27,12 +27,13 @@ namespace Server.Game
 
         // items in the scene (players count too)
         private List<Player> players;
-        internal List<Door> doors;
-        internal List<Monster> monsters;
-        internal List<HealingBottle> healingBottles;
-        internal List<ExperienceBottle> experienceBottles;
-        internal Dictionary<string, Trap[]> traps;
+        private List<Door> doors;
+        private List<Monster> monsters;
+        private List<HealingBottle> healingBottles;
+        private List<ExperienceBottle> experienceBottles;
+        private Dictionary<string, Trap[]> traps;
 
+        // internal Properties of scene info
         internal string GameField
         {
             get
@@ -41,22 +42,22 @@ namespace Server.Game
                 // draw the doors
                 foreach (Door door in doors)
                 {
-                    copy = copy.ReplaceAt(door.positionIndex, 1, "$");
+                    copy = copy.ReplaceAt(door.PositionIndex, 1, "$");
                 }
                 // draw the monsters
                 foreach (Monster monster in monsters)
                 {
-                    copy = copy.ReplaceAt(monster.positionIndex, 1, "@");
+                    copy = copy.ReplaceAt(monster.PositionIndex, 1, "@");
                 }
                 // draw the healing bottles
                 foreach (HealingBottle heal in healingBottles)
                 {
-                    copy = copy.ReplaceAt(heal.positionIndex, 1, "+");
+                    copy = copy.ReplaceAt(heal.PositionIndex, 1, "+");
                 }
                 // draw the experience bottles
                 foreach (ExperienceBottle experience in experienceBottles)
                 {
-                    copy = copy.ReplaceAt(experience.positionIndex, 1, "&");
+                    copy = copy.ReplaceAt(experience.PositionIndex, 1, "&");
                 }
                 // draw the traps
                 foreach (KeyValuePair<string, Trap[]> trapGroup in traps)
@@ -65,11 +66,11 @@ namespace Server.Game
                     {
                         if (trap.activated)
                         {
-                            copy = copy.ReplaceAt(trap.positionIndex, 1, "#");
+                            copy = copy.ReplaceAt(trap.PositionIndex, 1, "#");
                         }
                         else
                         {
-                            copy = copy.ReplaceAt(trap.positionIndex, 1, "*");
+                            copy = copy.ReplaceAt(trap.PositionIndex, 1, "*");
                         }
                     }
                 }
@@ -77,13 +78,37 @@ namespace Server.Game
                 int index = 0;
                 foreach (Player player in players)
                 {
-                    Console.WriteLine($"index: {index}; player-pos: [{player.position[0]}, {player.position[1]}]; addr: {player.socket.RemoteEndPoint}");
+                    Console.WriteLine($"index: {index}; player-pos: [{player.Position[0]}, {player.Position[1]}]; addr: {player.Socket.RemoteEndPoint}");
                     copy = copy.ReplaceAt(player.InSceneIndex, 1, "¶");
                     index++;
                 }
                 return copy;
             }
         }
+        internal string Name { get => name; }
+        internal int[] BeginPosition { get => new int[2] { beginPosition[0], beginPosition[1] }; }
+        internal int Width { get => width; }
+
+        // internal Properties of items in the scene
+        internal List<Player> Players { get => new List<Player>(players); }
+        internal List<Door> Doors { get => new List<Door>(doors); }
+        internal List<Monster> Monsters { get => new List<Monster>(monsters); }
+        internal List<HealingBottle> HealingBottles { get => new List<HealingBottle>(healingBottles); }
+        internal List<ExperienceBottle> ExperienceBottles { get => new List<ExperienceBottle>(experienceBottles); }
+        internal Dictionary<string, Trap[]> Traps { get
+            {
+                Dictionary<string, Trap[]> tmp = new();
+                foreach(KeyValuePair<string, Trap[]> pair in traps)
+                {
+                    List<Trap> traptmp = new();
+                    foreach(Trap trap in pair.Value)
+                    {
+                        traptmp.Add(trap);
+                    }
+                    tmp.Add(pair.Key, traptmp.ToArray());
+                }
+                return tmp;
+            } }
 
         internal Scene(Reference reference, string dataName)
         {
@@ -209,7 +234,15 @@ namespace Server.Game
                 // don't send any messages to disconnected players
                 try
                 {
-                    ServerSocket.SendMessage(player.socket, GameField);
+                    string message = "";
+                    message += $"Position: {player.Position[0]}, {player.Position[1]}";
+                    message += $"\nScene: {player.Scene.Name}";
+                    message += $"\nLevel: {player.CurrentLvl}";
+                    message += $"\nDamage: {player.Damage[0]} - {player.Damage[1]}";
+                    message += $"\nHP: {player.CurrentHp}/{player.MaxHp}";
+                    message += $"\nXP: {player.CurrentXp}/{player.XpNecUp * player.CurrentLvl}\n";
+                    message += GameField;
+                    ServerSocket.SendMessage(player.Socket, message);
                 }
                 catch(Exception e)
                 {
@@ -235,7 +268,7 @@ namespace Server.Game
             {
                 try
                 {
-                    bool connected = player.socket.Poll(1000, System.Net.Sockets.SelectMode.SelectRead);
+                    bool connected = player.Socket.Poll(1000, System.Net.Sockets.SelectMode.SelectRead);
                     if (connected)
                     {
                         Console.WriteLine("Disconnection found");

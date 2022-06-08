@@ -8,8 +8,11 @@ namespace Server.Game.Items
 {
     internal class Door : AItem
     {
-        internal int[] destPos = new int[2];
-        internal string destName;
+        private int[] destPos = new int[2];
+        private string destName;
+
+        internal int[] DestPos { get => new int[2] { destPos[0], destPos[1] }; }
+        internal string DestName { get => destName; }
 
         internal Door(int[] position, int[] destPos, string destName, int sceneWidth) : base(position, sceneWidth)
         {
@@ -24,7 +27,7 @@ namespace Server.Game.Items
         }
         private void Interact(Player player, Dictionary<string, Scene> scenes)
         {
-            Scene oldScene = player.scene;
+            Scene oldScene = player.Scene;
             Scene newScene = scenes[destName];
             player.Transfer(oldScene, newScene);
             player.MoveTo(destPos[0], destPos[1]);
@@ -35,7 +38,7 @@ namespace Server.Game.Items
             player.Move(x, y);
             int playerPosIndex = player.InSceneIndex;
             player.Move(-x, -y);
-            foreach(Door door in player.scene.doors)
+            foreach(Door door in player.Scene.Doors)
             {
                 if(playerPosIndex == door.positionIndex)
                 {
