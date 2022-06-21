@@ -36,12 +36,12 @@ namespace Server.Server
         private Reference gameReference;
 
         // data security sectup
-        private DataSecurity dataSecurity;
+        private static DataSecurity dataSecurity = new DataSecurity();
+
+        internal static DataSecurity DataSecurity => dataSecurity;
 
         internal ServerSocket(string host, int port)
         {
-            // data security keys setup
-            dataSecurity = new DataSecurity();
 
             players = new List<Player>();
             scenes = new Dictionary<string, Scene>();
@@ -89,6 +89,9 @@ namespace Server.Server
                 Console.WriteLine($"[New Connection]: {client.RemoteEndPoint}");
                 Console.ForegroundColor = standColor;
                 Player player = SetupPlayer(client);
+                Console.ForegroundColor = connColor;
+                Console.WriteLine($"[Save Connection]: A save connection has been established with {client.RemoteEndPoint}");
+                Console.ForegroundColor = standColor;
 
                 Thread loop = new Thread(() => GameLoop(player));
                 loop.Start();
@@ -97,9 +100,19 @@ namespace Server.Server
 
         private Player SetupPlayer(Socket client)
         {
+            // at first setup of the client with the public key exchange
+            string pubKey = GetMessage(client);
+
+            // then we can send our symmetric key encrypted with the client's public key
+            string enctypedKey = dataSecurity.EncryptRSA(pubKey, Convert.ToBase64String(dataSecurity.Aes.Key));
+            string encryptedIV = dataSecurity.EncryptRSA(pubKey, Convert.ToBase64String(dataSecurity.Aes.IV));
+
+            SendMessage(client, enctypedKey);
+            SendMessage(client, encryptedIV);
+
             PlayerStructure playerStructure = Serializer.Deserialize<PlayerStructure>(Path.Combine(@".\game-data\", gameReference.ItemDataPath, @"player.json"));
             Scene first = scenes.First().Value;
-            Player player = new Player(playerStructure.Hp, first.BeginPosition, playerStructure.Damage, playerStructure.XpNeededNext, first, client);
+            Player player = new Player(playerStructure.Hp, first.BeginPosition, playerStructure.Damage, playerStructure.XpNeededNext, first, client, pubKey);
             // add the player to this scene and to the global game
             first.AddplayerToScene(player);
             AddPlayer(player);

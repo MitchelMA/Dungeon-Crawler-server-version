@@ -59,6 +59,12 @@ namespace Shared.Security
             this.aes = aes;
         }
 
+        public void SetAES(byte[] key, byte[] IV)
+        {
+            aes.Key = key;
+            aes.IV = IV;
+        }
+
 
         public void ReRoll()
         {
@@ -86,14 +92,14 @@ namespace Shared.Security
             return _encoder.GetString(plainText);
         }
 
-        public string EncryptAES(string plainText, byte[] Key, byte[] IV)
+        public string EncryptAES(string plainText)
         {
             // Check arguments.
             if (plainText == null || plainText.Length <= 0)
                 throw new ArgumentNullException("plainText");
-            if (Key == null || Key.Length <= 0)
+            if (aes.Key == null || aes.Key.Length <= 0)
                 throw new ArgumentNullException("Key");
-            if (IV == null || IV.Length <= 0)
+            if (aes.IV == null || aes.IV.Length <= 0)
                 throw new ArgumentNullException("IV");
             byte[] encrypted;
 
@@ -101,8 +107,8 @@ namespace Shared.Security
             // with the specified key and IV.
             using (Aes aesAlg = Aes.Create())
             {
-                aesAlg.Key = Key;
-                aesAlg.IV = IV;
+                aesAlg.Key = aes.Key;
+                aesAlg.IV = aes.IV;
 
                 // Create an encryptor to perform the stream transform.
                 ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
@@ -126,14 +132,14 @@ namespace Shared.Security
             return Convert.ToBase64String(encrypted);
         }
 
-        public string DecryptAES(string cipherText, byte[] Key, byte[] IV)
+        public string DecryptAES(string cipherText)
         {
             // Check arguments.
             if (cipherText == null || cipherText.Length <= 0)
                 throw new ArgumentNullException("cipherText");
-            if (Key == null || Key.Length <= 0)
+            if (aes.Key == null || aes.Key.Length <= 0)
                 throw new ArgumentNullException("Key");
-            if (IV == null || IV.Length <= 0)
+            if (aes.IV == null || aes.IV.Length <= 0)
                 throw new ArgumentNullException("IV");
 
             // Declare the string used to hold
@@ -146,8 +152,8 @@ namespace Shared.Security
             // with the specified key and IV.
             using (Aes aesAlg = Aes.Create())
             {
-                aesAlg.Key = Key;
-                aesAlg.IV = IV;
+                aesAlg.Key = aes.Key;
+                aesAlg.IV = aes.IV;
 
                 // Create a decryptor to perform the stream transform.
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);

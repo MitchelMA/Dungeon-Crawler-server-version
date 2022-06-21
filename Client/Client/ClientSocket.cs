@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using Shared;
+using Shared.Security;
 
 namespace Client.Client
 {
@@ -18,8 +19,15 @@ namespace Client.Client
         private bool startedInput = false;
         private bool StopInput = false;
 
+        // data security class for keys
+        DataSecurity dataSecurity;
+
         internal ClientSocket(string host, int port)
         {
+            // setup for the dataSecurity class
+            dataSecurity = new DataSecurity();
+
+            // setup for the client socket
             IPAddress iPAddress = IPAddress.Parse(host);
             remoteEp = new IPEndPoint(iPAddress, port);
 
@@ -42,6 +50,7 @@ namespace Client.Client
         internal void Start()
         {
             client.Connect(remoteEp);
+            SetupPlayer();
 
             Console.WriteLine($"Connected to server: {remoteEp.Address}:{remoteEp.Port}");
             while (true)
@@ -58,6 +67,8 @@ namespace Client.Client
                     if (data != null)
                     {
                         Console.Clear();
+                        // now we can decrypt the message from the server
+                        string decrypted = dataSecurity.DecryptAES(data);
                         Console.WriteLine(data);
                         // after the first message, 
                         // the input loop may start
@@ -95,6 +106,9 @@ namespace Client.Client
 
         private void InputLoop()
         {
+            // setup for data security
+
+
             while (true)
             {
                 if (StopInput)
@@ -139,6 +153,22 @@ namespace Client.Client
             }
         }
 
+        private void SetupPlayer()
+        {
+            // first send the public key
+            SendMessage(dataSecurity.PublicXmlKey);
+
+            // then we should get the encrypted key and iv
+            string encryptedKey = GetMessage();
+            string encryptedIV = GetMessage();
+
+            // now we can decrypt the keys
+            byte[] decryptedKey = Convert.FromBase64String(dataSecurity.DecryptRSA(encryptedKey));
+            byte[] decryptedIV = Convert.FromBase64String(dataSecurity.DecryptRSA(encryptedIV));
+
+            // now set-up the symmetric key
+            dataSecurity.SetAES(decryptedKey, decryptedIV);
+        }
         internal string GetMessage()
         {
             string data = null;

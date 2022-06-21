@@ -22,6 +22,7 @@ namespace Server.Game
 
         private Scene scene;
         private readonly Socket socket;
+        private string publicXmlString;
 
         // internal Properties for the player info
         internal int InSceneIndex { get => position[1] * scene.Width + position[1] + position[0]; }
@@ -36,9 +37,10 @@ namespace Server.Game
 
         internal Scene Scene { get => scene; }
         internal Socket Socket { get => socket; }
+        internal string PublicXmlString => publicXmlString;
 
 
-        internal Player(int maxHp, int[] position, int[] damage, int xpNecUp, Scene scene, Socket socket)
+        internal Player(int maxHp, int[] position, int[] damage, int xpNecUp, Scene scene, Socket socket, string publicXmlString)
         {
             this.maxHp = maxHp;
             currentHp = maxHp;
@@ -56,6 +58,8 @@ namespace Server.Game
             this.scene = scene;
 
             this.socket = socket;
+
+            this.publicXmlString = publicXmlString;
         }
 
         internal void XpUp(int amount)

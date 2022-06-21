@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text.Json;
+using System.Security.Cryptography;
 using Server.Game.Items;
 using Server.Game.DataStructures;
 using Shared;
+using Shared.Security;
 using Server.Server;
 
 namespace Server.Game
@@ -261,7 +263,9 @@ namespace Server.Game
                     message += $"\nHP: {player.CurrentHp}/{player.MaxHp}";
                     message += $"\nXP: {player.CurrentXp}/{player.XpNecUp * player.CurrentLvl}\n";
                     message += GameField(player);
-                    ServerSocket.SendMessage(player.Socket, message);
+                    // first encrypt the message with the symmetric key
+                    string encryptedM = ServerSocket.DataSecurity.EncryptAES(message);
+                    ServerSocket.SendMessage(player.Socket, encryptedM);
                 }
                 catch (Exception e)
                 {
