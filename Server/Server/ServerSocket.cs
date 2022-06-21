@@ -27,12 +27,11 @@ namespace Server.Server
         // info about the game, for instance: the reference.json
         private Reference gameReference;
 
-        internal ServerSocket(string host, int port, bool ipv4)
+        internal ServerSocket(string host, int port)
         {
             players = new List<Player>();
             scenes = new Dictionary<string, Scene>();
-            IPHostEntry hostEntry = Dns.GetHostEntry(host);
-            IPAddress ipAddress = hostEntry.AddressList[Convert.ToInt32(ipv4)];
+            IPAddress ipAddress = IPAddress.Parse(host);
             endPoint = new IPEndPoint(ipAddress, port);
 
             listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);

@@ -18,10 +18,9 @@ namespace Client.Client
         private bool startedInput = false;
         private bool StopInput = false;
 
-        internal ClientSocket(string host, int port, bool ipv4)
+        internal ClientSocket(string host, int port)
         {
-            IPHostEntry hostEntry = Dns.GetHostEntry(host);
-            IPAddress iPAddress = hostEntry.AddressList[Convert.ToInt32(ipv4)];
+            IPAddress iPAddress = IPAddress.Parse(host);
             remoteEp = new IPEndPoint(iPAddress, port);
 
             client = new Socket(iPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
