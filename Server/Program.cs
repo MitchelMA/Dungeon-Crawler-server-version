@@ -10,6 +10,7 @@ namespace Server
     {
         static void Main(string[] args)
         {
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Use local connection? [y/n]");
             string input = Console.ReadLine().Trim();
             string host;

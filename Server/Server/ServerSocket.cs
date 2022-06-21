@@ -24,6 +24,12 @@ namespace Server.Server
 
         private const short header = 64;
 
+        // console log colours
+        internal static readonly ConsoleColor standColor = ConsoleColor.White;
+        internal static readonly ConsoleColor errColor = ConsoleColor.Red;
+        internal static readonly ConsoleColor connColor = ConsoleColor.Green;
+        internal static readonly ConsoleColor disconnColor = ConsoleColor.Blue;
+
         // info about the game, for instance: the reference.json
         private Reference gameReference;
 
@@ -65,11 +71,15 @@ namespace Server.Server
 
         private void ListenForClients()
         {
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"[Listening]: Server started listening on: {endPoint.Address}:{endPoint.Port}");
+            Console.ForegroundColor = standColor;
             while (true)
             {
                 Socket client = listener.Accept();
+                Console.ForegroundColor = connColor;
                 Console.WriteLine($"[New Connection]: {client.RemoteEndPoint}");
+                Console.ForegroundColor = standColor;
                 Player player = SetupPlayer(client);
 
                 Thread loop = new Thread(() => GameLoop(player));
@@ -139,15 +149,19 @@ namespace Server.Server
                 }
                 catch (ArgumentException e)
                 {
+                    Console.ForegroundColor = errColor;
                     Console.WriteLine("Kon input niet parsen naar Enum typeof Input");
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
+                    Console.ForegroundColor = standColor;
                 }
                 catch (SocketException e)
                 {
+                    Console.ForegroundColor = errColor;
                     Console.WriteLine("Er ging iets mis tijdens de verbinding:");
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
+                    Console.ForegroundColor = standColor;
                     // and update all the other players
                     UpdatePlayers(player.Scene);
                     // break this loop to end the connection on the client's side
@@ -155,9 +169,11 @@ namespace Server.Server
                 }
                 catch (ObjectDisposedException e)
                 {
+                    Console.ForegroundColor = errColor;
                     Console.WriteLine("Er ging iets mis tijdens de verbinding:");
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
+                    Console.ForegroundColor = standColor;
                     // and update all the other players
                     UpdatePlayers(player.Scene);
                     // break this loop to end the connection on the client's side
@@ -165,10 +181,11 @@ namespace Server.Server
                 }
                 catch (Exception e)
                 {
+                    Console.ForegroundColor = errColor;
                     Console.WriteLine("Er ging iets mis:");
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
-                    
+                    Console.ForegroundColor = standColor;
                 }
 
             }
@@ -229,9 +246,11 @@ namespace Server.Server
                 }
                 catch (Exception e)
                 {
+                    Console.ForegroundColor = errColor;
                     Console.WriteLine("Failed to disconnect socket: socket was most likely already disconnected");
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
+                    Console.ForegroundColor = standColor;
                 }
             }
         }
@@ -252,9 +271,11 @@ namespace Server.Server
                 }
                 catch (Exception e)
                 {
+                    Console.ForegroundColor = errColor;
                     Console.WriteLine("Failed to disconnect socket: socket was most likely already disconnected");
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
+                    Console.ForegroundColor = standColor;
                 }
             }
         }

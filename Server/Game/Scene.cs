@@ -265,9 +265,11 @@ namespace Server.Game
                 }
                 catch (Exception e)
                 {
+                    Console.ForegroundColor = ServerSocket.errColor;
                     Console.WriteLine("Failed to update player");
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
+                    Console.ForegroundColor = ServerSocket.standColor;
                 }
             }
             // at the end, return all the disconnected, so the server knows which one to clean up
@@ -290,16 +292,21 @@ namespace Server.Game
                     bool connected = player.Socket.Poll(1000, System.Net.Sockets.SelectMode.SelectRead);
                     if (connected)
                     {
+                        Console.ForegroundColor = ServerSocket.disconnColor;
                         Console.WriteLine("Disconnection found");
+                        Console.ForegroundColor = ServerSocket.standColor;
                         disconnected.Add(player);
                         continue;
                     }
                 }
                 catch (Exception e)
                 {
+                    Console.ForegroundColor = ServerSocket.errColor;
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
+                    Console.ForegroundColor = ServerSocket.disconnColor;
                     Console.WriteLine("Disconnection found");
+                    Console.ForegroundColor = ServerSocket.standColor;
                     disconnected.Add(player);
                 }
             }
