@@ -88,7 +88,22 @@ namespace Server.Server
                 Console.ForegroundColor = connColor;
                 Console.WriteLine($"[New Connection]: {client.RemoteEndPoint}");
                 Console.ForegroundColor = standColor;
-                Player player = SetupPlayer(client);
+                Player player;
+                try
+                {
+                    player = SetupPlayer(client);
+                }
+                catch(Exception e)
+                {
+                    Console.ForegroundColor = errColor;
+                    Console.WriteLine("Failed to establish a save connection");
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                    Console.ForegroundColor = standColor;
+                    client.Dispose();
+                    continue;
+                }
+
                 Console.ForegroundColor = connColor;
                 Console.WriteLine($"[Save Connection]: A save connection has been established with {client.RemoteEndPoint}");
                 Console.ForegroundColor = standColor;
@@ -138,7 +153,9 @@ namespace Server.Server
                 {
                     // try to parse the input data to the input Enum
                     string data = GetMessage(player.Socket);
-                    Input input = (Input)Enum.Parse(typeof(Input), data);
+                    // decrypt the input
+                    string decryptedD = dataSecurity.DecryptAES(data);
+                    Input input = (Input)Enum.Parse(typeof(Input), decryptedD);
                     Console.WriteLine(input);
                     switch (input)
                     {

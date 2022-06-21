@@ -69,7 +69,7 @@ namespace Client.Client
                         Console.Clear();
                         // now we can decrypt the message from the server
                         string decrypted = dataSecurity.DecryptAES(data);
-                        Console.WriteLine(data);
+                        Console.WriteLine(decrypted);
                         // after the first message, 
                         // the input loop may start
                         InitiateInput();
@@ -123,16 +123,16 @@ namespace Client.Client
                 switch (input)
                 {
                     case ConsoleKey.UpArrow:
-                        SendMessage(Enum.GetName(typeof(Input), Input.up));
+                        SendMessage(dataSecurity.EncryptAES(Enum.GetName(typeof(Input), Input.up)));
                         break;
                     case ConsoleKey.RightArrow:
-                        SendMessage(Enum.GetName(typeof(Input), Input.right));
+                        SendMessage(dataSecurity.EncryptAES(Enum.GetName(typeof(Input), Input.right)));
                         break;
                     case ConsoleKey.DownArrow:
-                        SendMessage(Enum.GetName(typeof(Input), Input.down));
+                        SendMessage(dataSecurity.EncryptAES(Enum.GetName(typeof(Input), Input.down)));
                         break;
                     case ConsoleKey.LeftArrow:
-                        SendMessage(Enum.GetName(typeof(Input), Input.left));
+                        SendMessage(dataSecurity.EncryptAES(Enum.GetName(typeof(Input), Input.left)));
                         break;
                     case ConsoleKey.Q:
                         client.Dispose();
@@ -144,7 +144,7 @@ namespace Client.Client
                         break;
 
                     default:
-                        SendMessage(Enum.GetName(typeof(Input), Input.ignore));
+                        SendMessage(dataSecurity.EncryptAES(Enum.GetName(typeof(Input), Input.ignore)));
                         break;
                 }
                 // sleep at least this amount
