@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
@@ -11,6 +12,7 @@ using Server.Game;
 using Server.Game.Items;
 using Server.Game.DataStructures;
 using Shared;
+using Shared.Security;
 
 namespace Server.Server
 {
@@ -33,8 +35,14 @@ namespace Server.Server
         // info about the game, for instance: the reference.json
         private Reference gameReference;
 
+        // data security sectup
+        private DataSecurity dataSecurity;
+
         internal ServerSocket(string host, int port)
         {
+            // data security keys setup
+            dataSecurity = new DataSecurity();
+
             players = new List<Player>();
             scenes = new Dictionary<string, Scene>();
             IPAddress ipAddress = IPAddress.Parse(host);
