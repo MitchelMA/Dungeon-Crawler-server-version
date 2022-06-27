@@ -38,7 +38,7 @@ namespace Client.Client
         {
             try
             {
-                return client.Poll(1000, SelectMode.SelectRead);
+                return client.Poll(10000, SelectMode.SelectRead);
             }
             catch
             {
@@ -51,16 +51,11 @@ namespace Client.Client
         {
             client.Connect(remoteEp);
             SetupPlayer();
+            InitiateInput();
 
             Console.WriteLine($"Connected to server: {remoteEp.Address}:{remoteEp.Port}");
             while (true)
             {
-                if (TryConnection())
-                {
-                    Console.WriteLine("Disconnected from the server: Polling took too long");
-                    StopInput = true;
-                    //break;
-                }
                 try
                 {
                     string data = GetMessage();
@@ -70,9 +65,6 @@ namespace Client.Client
                         // now we can decrypt the message from the server
                         string decrypted = dataSecurity.DecryptAES(data);
                         Console.WriteLine(decrypted);
-                        // after the first message, 
-                        // the input loop may start
-                        InitiateInput();
                     }
                 }
                 catch (Exception e)
@@ -84,6 +76,12 @@ namespace Client.Client
                     StopInput = true;
                     break;
                 }
+                //if (TryConnection())
+                //{
+                //    Console.WriteLine("Disconnected from the server: Polling took too long");
+                //    StopInput = true;
+                //    break;
+                //}
             }
         }
 
