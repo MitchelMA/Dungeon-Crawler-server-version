@@ -37,7 +37,9 @@ namespace Shared.Security
         }
         public DataSecurity(Aes aes)
         {
-            var csp = new RSACryptoServiceProvider();
+            RSA csp = new RSACryptoServiceProvider();
+            publicXmlKey = csp.ToXmlString(false);
+            privateXmlKey = csp.ToXmlString(true);
 
             this.aes = aes;
         }
