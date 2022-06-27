@@ -48,9 +48,11 @@ namespace ClientUI.Drawing
         {
             // get the src location from the charlist
             TileSrcLocation srcLocation = charTiles[character];
+
             // convert the string-index to a x and y coordinate
             int x = stringIndex % stringWidth;
             int y = stringIndex / stringWidth;
+
             // copy the data to Rectangles
             Rectangle placement = new Rectangle(x * tileSize, y * tileSize, tileSize, tileSize);
             Rectangle sprite = new Rectangle(srcLocation.position.X, srcLocation.position.Y, srcLocation.widthHeight.X, srcLocation.widthHeight.Y);
@@ -67,11 +69,11 @@ namespace ClientUI.Drawing
         {
             // get the src location from the namelist
             TileSrcLocation srcLocation = nameTiles[name];
+
             // convert the string-index to a x and y coordinate
-            int offset = (stringIndex % stringWidth * (tileSize / srcLocation.widthHeight.X));
-            //int x = stringIndex % stringWidth * tileSize - (stringIndex % stringWidth * (tileSize / srcLocation.widthHeight.X));
             int x = stringIndex % stringWidth * tileSize;
             int y = stringIndex / stringWidth * tileSize;
+
             // copy the data to Rectangles
             Rectangle placement = new Rectangle(x, y, tileSize, tileSize);
             Rectangle sprite = new Rectangle(srcLocation.position.X, srcLocation.position.Y, srcLocation.widthHeight.X, srcLocation.widthHeight.Y);

@@ -15,6 +15,8 @@ namespace ClientUI
 
         public ClientUIForm()
         {
+            InitializeComponent();
+
             // set the directory in which the tilemaps will go
             tileDirectory = Path.Combine(exeDir, @".\TileMaps\");
 
@@ -25,10 +27,12 @@ namespace ClientUI
             // create the parser
             tileParser = factory.Create(spriteMapperFileName);
 
-            InitializeComponent();
-            DoubleBuffered = true;
+            // reading from a spritesheet or "bitmap" is weird: you need uneven, preceding cords for the x-axis
+            // for instance, if you want to have sprite with an x-cord of `22`, your input x-cord should be `21`
+            // why? I don't know, that's just how it works or something?
             spriteSheet = Bitmap.FromFile(Path.Combine(exeDir, "sprites.png"));
             this.Text = standText;
+            DoubleBuffered = true;
         }
 
         // drawing of the gamefield
@@ -37,7 +41,7 @@ namespace ClientUI
             List<Tile> tiles = new List<Tile>();
             for(int i = 0; i < 80; i++)
             {
-                tiles.Add(tileParser.Parse("background", i, 10, 16));
+                tiles.Add(tileParser.Parse("background", i, 10, 40));
             }
             base.OnPaint(e);
             Graphics g = e.Graphics;
@@ -48,6 +52,7 @@ namespace ClientUI
 
             foreach (Tile tile in tiles)
             {
+                tile.placement.Offset(0, topPadding);
                 g.DrawImage(spriteSheet, tile.placement, tile.sprite, GraphicsUnit.Pixel);
             }
         }
