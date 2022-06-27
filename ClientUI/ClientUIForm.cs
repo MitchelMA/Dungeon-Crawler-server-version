@@ -1,4 +1,5 @@
 using ClientUI.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace ClientUI
 {
@@ -24,23 +25,31 @@ namespace ClientUI
             // create the parser
             tileParser = factory.Create(spriteMapperFileName);
 
-            Tile test = tileParser.Parse("background", 20, 10, 16);
-            string positionString = $"[{test.placement.X}; {test.placement.Y}] : [{test.placement.Height}; {test.placement.Width}]";
-            string spriteString = $"[{test.sprite.X}; {test.sprite.Y}] : [{test.sprite.Height}; {test.sprite.Width}]";
-
             InitializeComponent();
             DoubleBuffered = true;
-            spriteSheet = Image.FromFile(Path.Combine(exeDir, "sprites.png"));
+            spriteSheet = Bitmap.FromFile(Path.Combine(exeDir, "sprites.png"));
             this.Text = standText;
         }
 
         // drawing of the gamefield
         protected override void OnPaint(PaintEventArgs e)
         {
+            List<Tile> tiles = new List<Tile>();
+            for(int i = 0; i < 80; i++)
+            {
+                tiles.Add(tileParser.Parse("background", i, 10, 16));
+            }
             base.OnPaint(e);
-
             Graphics g = e.Graphics;
-            g.DrawImage(spriteSheet, new Rectangle(0, topPadding, spriteSheet.Width, spriteSheet.Height));
+            //make nice pixels
+            g.SmoothingMode = SmoothingMode.None;
+            g.InterpolationMode = InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+            foreach (Tile tile in tiles)
+            {
+                g.DrawImage(spriteSheet, tile.placement, tile.sprite, GraphicsUnit.Pixel);
+            }
         }
     }
 }
