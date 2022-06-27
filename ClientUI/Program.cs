@@ -1,3 +1,5 @@
+using ClientUI.Drawing;
+
 namespace ClientUI
 {
     internal static class Program

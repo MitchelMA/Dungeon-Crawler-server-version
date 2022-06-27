@@ -12,6 +12,14 @@
     <None Update="sprites.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+	  <!-- Copy's the whole `TileMaps` directory and all its content -->
+	  <Content Include="TileMaps\**">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="TileMaps\stand.csv" />
   </ItemGroup>
 
 </Project>
