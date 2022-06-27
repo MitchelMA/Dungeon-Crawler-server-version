@@ -34,6 +34,7 @@ namespace Server.Server
 
         // info about the game, for instance: the reference.json
         private Reference gameReference;
+        private static bool flagCaptured = false;
 
         // data security sectup
         private static DataSecurity dataSecurity = new DataSecurity();
@@ -142,6 +143,16 @@ namespace Server.Server
         {
             while (true)
             {
+                if(flagCaptured)
+                {
+                    string message = "The flag has been captured!\n\n\n";
+                    string encrypted = dataSecurity.EncryptAES(message);
+                    SendMessage(player.Socket, encrypted);
+                    // now dispose the player
+                    Thread.Sleep(500);
+                    player.Socket.Dispose();
+                    break;
+                }
                 UpdateStatus(player.Scene);
                 if (!players.Contains(player))
                 {
@@ -183,6 +194,18 @@ namespace Server.Server
                         default:
                             break;
                     }
+
+                    // now we have to account for the fact that the player may have died this round
+                    Console.WriteLine("Health: " + player.CurrentHp);
+                    if(player.CurrentHp <= 0)
+                    {
+                        string message = "Game Over!\nYou Died!\n\n\n";
+                        string encrypted = dataSecurity.EncryptAES(message);
+                        SendMessage(player.Socket, encrypted);
+                        // now dispose this player
+                        player.Socket.Dispose();
+                    }
+
                     UpdatePlayers(player.Scene);
                 }
                 catch (ArgumentException e)
@@ -373,6 +396,10 @@ namespace Server.Server
                 case '*':
                     Trap.CheckForPlayer(player, x, y);
                     player.Move(x * 2, y * 2);
+                    break;
+                // Flag
+                case '!':
+                    flagCaptured = true;
                     break;
                 default:
                     player.Move(x, y);
