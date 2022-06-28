@@ -22,4 +22,8 @@
     <None Remove="TileMaps\stand.csv" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.csproj" />
+  </ItemGroup>
+
 </Project>
