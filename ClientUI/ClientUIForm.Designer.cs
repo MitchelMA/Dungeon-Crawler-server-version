@@ -81,6 +81,7 @@
             this.ConnectBtn.TabIndex = 1;
             this.ConnectBtn.Text = "Connect";
             this.ConnectBtn.UseVisualStyleBackColor = true;
+            this.ConnectBtn.Click += new System.EventHandler(this.ConnectBtn_Click);
             // 
             // ClientUIForm
             // 
