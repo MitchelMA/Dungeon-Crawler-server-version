@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using System.Drawing.Drawing2D;
 using ClientUI.Drawing;
 using ClientUI.Client;
@@ -83,15 +83,69 @@ namespace ClientUI
             // clear the tiles
             tiles.Clear();
             string field = String.Join('\0', fieldParts);
-             
+
+            // presets for the types of tiles
+            Tile floorTile = tileParser.Parse("floor", 0, 1, tileSize);
+            Tile monsterTile = tileParser.Parse("monster", 0, 1, tileSize);
+            Tile playerTile = tileParser.Parse("player", 0, 1, tileSize);
+            Tile otherPlayerTile = tileParser.Parse("otherp", 0, 1, tileSize);
+            Tile wallTile = tileParser.Parse("wallH", 0, 1, tileSize);
+            Tile cornerTile = tileParser.Parse("cornerTR", 0, 1, tileSize);
+
             // now turn the field int a list of tiles
-            for(int i = 0; i < field.Length; i++)
+            for (int i = 0; i < field.Length; i++)
             {
-                try
+                Tile t = null;
+                // optimizing the code itself
+                if (field[i] == ' ')
                 {
-                    Tile tile = tileParser.Parse(field[i], i, fieldWidth, tileSize);
-                    tiles.Add(tile);
-                } catch { }
+                    continue;
+                }
+                // now copy the pre-parsed tiles
+                switch (field[i])
+                {
+                    // floor-tile
+                    case '·':
+                        t = new Tile(floorTile);
+                        break;
+                    // monster-til
+                    case '@':
+                        t = new Tile(monsterTile);
+                        break;
+                    // player-tile
+                    case '¶':
+                        t = new Tile(playerTile);
+                        break;
+                    // other-player-tile
+                    case '?':
+                        t = new Tile(otherPlayerTile);
+                        break;
+                    // walls
+                    case '│':
+                    case '─':
+                        t = new Tile(wallTile);
+                        break;
+                    // corner tiles
+                    case '┐':
+                    case '┌':
+                    case '└':
+                    case '┘':
+                        t = new Tile(cornerTile);
+                        break;
+                }
+
+                if (t == null)
+                {
+                    continue;
+                }
+
+                // set the correct cords of the pre-parsed copy
+                int x = i % fieldWidth;
+                int y = i / fieldWidth;
+
+                t.placement.X = x * tileSize;
+                t.placement.Y = y * tileSize;
+                tiles.Add(t);
             }
             Console.WriteLine("Debug Six");
             // now invalidate the canvas to force it to paint again
@@ -103,9 +157,10 @@ namespace ClientUI
             // try to dispose the client first
             try
             {
-                if(clientSocket != null)
+                if (clientSocket != null)
                     clientSocket.Close();
-            } catch { }
+            }
+            catch { }
             Console.WriteLine("Clicked!");
             // get the values of the the text-boxes
             string host = "127.0.0.1";
@@ -115,11 +170,11 @@ namespace ClientUI
                 host = IPAddressTSTB.Text;
                 port = int.Parse(PortTSTB.Text);
             }
-            catch(Exception err) 
+            catch (Exception err)
             {
                 port = 80;
             }
-            
+
             try
             {
                 clientSocket = new ClientSocket(host, port, this);
@@ -128,7 +183,7 @@ namespace ClientUI
 
             // now try to connect
             // connecto to the client in a new thread
-             if(clientSocket != null)
+            if (clientSocket != null)
             {
                 connectionThread = new Task(clientSocket.Connect);
                 connectionThread.Start();

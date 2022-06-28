@@ -58,11 +58,7 @@ namespace ClientUI.Drawing
             Rectangle sprite = new Rectangle(srcLocation.position.X, srcLocation.position.Y, srcLocation.widthHeight.X, srcLocation.widthHeight.Y);
 
             // return a new instance of a tile
-            return new Tile
-            {
-                placement = placement,
-                sprite = sprite,
-            };
+            return new Tile(placement, sprite);
         }
 
         internal Tile Parse(string name, int stringIndex, int stringWidth, int tileSize)
@@ -79,11 +75,7 @@ namespace ClientUI.Drawing
             Rectangle sprite = new Rectangle(srcLocation.position.X, srcLocation.position.Y, srcLocation.widthHeight.X, srcLocation.widthHeight.Y);
 
             // return a new instance of a tile
-            return new Tile
-            {
-                placement = placement,
-                sprite = sprite,
-            };
-        }
+            return new Tile(placement, sprite);
+        } 
     }
 }
