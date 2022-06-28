@@ -22,24 +22,14 @@ namespace ClientUI.Drawing
             // copy all the names
             foreach (KeyValuePair<string, TileSrcLocation> kvp in copy.nameTiles)
             {
-                TileSrcLocation tmp = new TileSrcLocation
-                {
-                    position = new Point(kvp.Value.position.X, kvp.Value.position.Y),
-                    widthHeight = new Point(kvp.Value.widthHeight.X, kvp.Value.widthHeight.Y),
-                };
-
+                TileSrcLocation tmp = new TileSrcLocation(kvp.Value);
                 nameTiles.Add(kvp.Key, tmp);
             }
 
             // now copy all the chars
             foreach (KeyValuePair<char, TileSrcLocation> kvp in copy.charTiles)
             {
-                TileSrcLocation tmp = new TileSrcLocation
-                {
-                    position = new Point(kvp.Value.position.X, kvp.Value.position.Y),
-                    widthHeight = new Point(kvp.Value.widthHeight.X, kvp.Value.widthHeight.Y),
-                };
-
+                TileSrcLocation tmp = new TileSrcLocation(kvp.Value);
                 charTiles.Add(kvp.Key, tmp);
             }
         }
