@@ -10,7 +10,7 @@ namespace ClientUI
     public partial class ClientUIForm : Form
     {
         internal Image spriteSheet;
-        internal int topPadding = 50;
+        internal int topPadding = 32;
         internal string standText = "Client";
         internal readonly string spriteMapperFileName;
         internal ParseToTile tileParser;
@@ -104,7 +104,7 @@ namespace ClientUI
             //PlayerInfo.Text = playerInfoS;
             Invoke(() =>
             {
-                PlayerInfo.Text = playerInfoS;
+                PlayerInfoL.Text = playerInfoS;
             });
             //PlayerInfo.Text = String.Join(Environment.NewLine, playerInfo);
 
@@ -182,6 +182,7 @@ namespace ClientUI
                             string inpE = clientSocket.DataSecurity.EncryptAES(inp);
                             clientSocket.SendMessage(inpE);
                             clientSocket.Close();
+                            ClearScreen();
                         }
                         break;
                     case Keys.Q:
@@ -189,6 +190,7 @@ namespace ClientUI
                             string inp = Enum.GetName(typeof(Input), Input.quit);
                             string inpE = clientSocket.DataSecurity.EncryptAES(inp);
                             clientSocket.SendMessage(inpE);
+                            ClearScreen();
                         }
                         break;
                     case Keys.Up:
@@ -223,6 +225,13 @@ namespace ClientUI
                 Thread.Sleep(050);
             }
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        internal void ClearScreen()
+        {
+            tiles.Clear();
+            PlayerInfoL.Text = "";
+            Invalidate();
         }
     }
 }

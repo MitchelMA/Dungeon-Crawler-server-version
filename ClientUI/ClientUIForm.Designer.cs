@@ -28,13 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClientUIForm));
             this.ConnectionMenuStrip = new System.Windows.Forms.MenuStrip();
             this.IPAddressMI = new System.Windows.Forms.ToolStripMenuItem();
             this.IPAddressTSTB = new System.Windows.Forms.ToolStripTextBox();
             this.PortMI = new System.Windows.Forms.ToolStripMenuItem();
             this.PortTSTB = new System.Windows.Forms.ToolStripTextBox();
             this.ConnectBtn = new System.Windows.Forms.Button();
-            this.PlayerInfo = new System.Windows.Forms.Label();
+            this.PlayerInfoL = new System.Windows.Forms.Label();
             this.ConnectionMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -85,28 +86,29 @@
             this.ConnectBtn.UseVisualStyleBackColor = true;
             this.ConnectBtn.Click += new System.EventHandler(this.ConnectBtn_Click);
             // 
-            // PlayerInfo
+            // PlayerInfoL
             // 
-            this.PlayerInfo.AutoSize = true;
-            this.PlayerInfo.Dock = System.Windows.Forms.DockStyle.Right;
-            this.PlayerInfo.Font = new System.Drawing.Font("Arial", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-            this.PlayerInfo.Location = new System.Drawing.Point(719, 27);
-            this.PlayerInfo.Name = "PlayerInfo";
-            this.PlayerInfo.Padding = new System.Windows.Forms.Padding(0, 0, 6, 0);
-            this.PlayerInfo.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.PlayerInfo.Size = new System.Drawing.Size(80, 16);
-            this.PlayerInfo.TabIndex = 2;
-            this.PlayerInfo.Text = "PlayerInfo:";
-            this.PlayerInfo.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.PlayerInfoL.AutoSize = true;
+            this.PlayerInfoL.Dock = System.Windows.Forms.DockStyle.Right;
+            this.PlayerInfoL.Font = new System.Drawing.Font("Arial", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.PlayerInfoL.Location = new System.Drawing.Point(719, 27);
+            this.PlayerInfoL.Name = "PlayerInfoL";
+            this.PlayerInfoL.Padding = new System.Windows.Forms.Padding(0, 0, 6, 0);
+            this.PlayerInfoL.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.PlayerInfoL.Size = new System.Drawing.Size(80, 16);
+            this.PlayerInfoL.TabIndex = 2;
+            this.PlayerInfoL.Text = "PlayerInfo:";
+            this.PlayerInfoL.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // ClientUIForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(799, 450);
-            this.Controls.Add(this.PlayerInfo);
+            this.Controls.Add(this.PlayerInfoL);
             this.Controls.Add(this.ConnectBtn);
             this.Controls.Add(this.ConnectionMenuStrip);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "ClientUIForm";
             this.Text = "Client";
@@ -125,6 +127,6 @@
         private ToolStripMenuItem PortMI;
         private ToolStripTextBox PortTSTB;
         private Button ConnectBtn;
-        private Label PlayerInfo;
+        private Label PlayerInfoL;
     }
 }
