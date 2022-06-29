@@ -101,19 +101,17 @@ namespace ClientUI
             string[] playerInfo = parts.Where((source, index) => index < 6).ToArray();
             // display all the playerInfo
             string playerInfoS = String.Join(Environment.NewLine, playerInfo);
-            //PlayerInfo.Text = playerInfoS;
+            // set the text with the invoke to run it in the main thread (this method gets called by another task)
             Invoke(() =>
             {
                 PlayerInfoL.Text = playerInfoS;
             });
-            //PlayerInfo.Text = String.Join(Environment.NewLine, playerInfo);
 
             string[] fieldParts = parts.Where((source, index) => index >= 6).ToArray();
             fieldWidth = (fieldParts[0]).Length + 1;
             string field = String.Join('\0', fieldParts);
             // set the new values of the tiles
-            tiles = tileParser.ParseText(field, fieldWidth, 16);
-            Console.WriteLine("Debug Six");
+            tiles = tileParser.ParseTextNew(field, fieldWidth, 16);
             // now invalidate the canvas to force it to paint again
             Invalidate();
         }
@@ -127,7 +125,6 @@ namespace ClientUI
                     clientSocket.Close();
             }
             catch { }
-            Console.WriteLine("Clicked!");
             // get the values of the the text-boxes
             string host = "127.0.0.1";
             int port = 80;
@@ -154,8 +151,6 @@ namespace ClientUI
                 if (connectionTask != null)
                 {
                     connectionCTokenSource.Cancel();
-                    int count = Process.GetCurrentProcess().Threads.Count;
-                    Console.WriteLine(count);
                 }
                 // create a new CancellationTokenSource, from which I can get a new token to reset the cancelled status
                 connectionCTokenSource = new CancellationTokenSource();
@@ -190,6 +185,7 @@ namespace ClientUI
                             string inp = Enum.GetName(typeof(Input), Input.quit);
                             string inpE = clientSocket.DataSecurity.EncryptAES(inp);
                             clientSocket.SendMessage(inpE);
+                            clientSocket.Close();
                             ClearScreen();
                         }
                         break;

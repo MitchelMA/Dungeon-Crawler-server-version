@@ -11,10 +11,22 @@ namespace ClientUI.Drawing
         internal Dictionary<char, TileSrcLocation> charTiles = new Dictionary<char, TileSrcLocation>();
         internal Dictionary<string, TileSrcLocation> nameTiles = new Dictionary<string, TileSrcLocation>();
 
+        private char[] charIndex;
+        private Tile[] tileIndex;
+
         internal ParseToTile(Dictionary<char, TileSrcLocation> charTiles, Dictionary<string, TileSrcLocation> nameTiles)
         {
             this.charTiles = charTiles;
             this.nameTiles = nameTiles;
+
+            // create the char and tile index corresponding to the dictionaries
+            // this is usefull for faster parsing a bigger string
+            charIndex = charTiles.Keys.ToArray();
+            tileIndex = new Tile[charIndex.Length];
+            for(int i = 0; i < charIndex.Length; i++)
+            {
+                tileIndex[i] = Parse(charIndex[i], 0, 1, 16); 
+            }
         }
 
         internal ParseToTile(ParseToTile copy)
@@ -31,6 +43,22 @@ namespace ClientUI.Drawing
             {
                 TileSrcLocation tmp = new TileSrcLocation(kvp.Value);
                 charTiles.Add(kvp.Key, tmp);
+            }
+
+            // copy the charIndex
+            charIndex = new char[copy.charIndex.Length];
+            for(int i = 0; i < copy.charIndex.Length; i++)
+            {
+                // this copies the value rather than the address
+                charIndex[i] = copy.charIndex[i];
+            }
+
+            // copy the tileIndex
+            tileIndex = new Tile[charIndex.Length];
+            for(int i = 0; i < copy.tileIndex.Length; i++)
+            {
+                // this uses the copy-constructor of the tile to create a copy rather than copy the address
+                tileIndex[i] = new Tile(copy.tileIndex[i]);
             }
         }
 
@@ -155,6 +183,44 @@ namespace ClientUI.Drawing
                 t.placement.X = x * tileSize;
                 t.placement.Y = y * tileSize;
                 tiles.Add(t);
+            }
+            return tiles;
+        }
+
+        internal List<Tile> ParseTextNew(string text, int textWidth, int tileSize)
+        {
+            List<Tile> tiles = new List<Tile>();
+            
+            for(int i = 0; i < text.Length; i++)
+            {
+                if(text[i] == ' ')
+                {
+                    continue;
+                }
+                // current character
+                char cc = text[i];
+
+                // current character-index
+                int ccI = Array.IndexOf(charIndex, cc);
+                if(ccI == -1)
+                {
+                    continue;
+                }
+                // current tile
+                Tile ccT = new Tile(tileIndex[ccI]);
+
+                // convert the string-index to an x and y coördinate
+                int x = i % textWidth;
+                int y = i / textWidth;
+
+                // now correct the placement
+                ccT.placement.X = x * tileSize;
+                ccT.placement.Y = y * tileSize;
+                ccT.placement.Width = tileSize;
+                ccT.placement.Height = tileSize;
+
+                // and add the current tile to the list of tiles
+                tiles.Add(ccT);
             }
             return tiles;
         }
