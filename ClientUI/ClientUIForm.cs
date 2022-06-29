@@ -3,6 +3,7 @@ using System.Drawing.Drawing2D;
 using ClientUI.Drawing;
 using ClientUI.Client;
 using System.Diagnostics;
+using Shared;
 
 namespace ClientUI
 {
@@ -24,7 +25,8 @@ namespace ClientUI
         private int fieldWidth = 10;
         private int tileSize = 16;
 
-        // other threads
+        // other tasks
+        // connection task
         Task connectionTask;
         CancellationTokenSource connectionCTokenSource = new CancellationTokenSource();
         CancellationToken connectionCToken;
@@ -42,7 +44,7 @@ namespace ClientUI
             // create the parser
             tileParser = factory.Create(spriteMapperFileName);
 
-            // get a cancellation token for the connectionTask;
+            // get a cancellation token for the tasks
             connectionCToken = connectionCTokenSource.Token;
 
             // reading from a spritesheet or "bitmap" is weird: you need uneven, preceding cords for the x-axis
@@ -60,10 +62,16 @@ namespace ClientUI
             try
             {
                 connectionCTokenSource.Cancel();
-                connectionTask.Dispose();
+                if(connectionTask != null)
+                {
+                    connectionTask.Dispose();
+                }
+                if(clientSocket != null)
+                {
+                    clientSocket.Close();
+                }
             }
             catch { };
-            clientSocket.Close();
         }
 
         // drawing of the gamefield
@@ -91,6 +99,15 @@ namespace ClientUI
             // by definition, the gamefield starts at index 6
             // and all the player-info is before that
             string[] playerInfo = parts.Where((source, index) => index < 6).ToArray();
+            // display all the playerInfo
+            string playerInfoS = String.Join(Environment.NewLine, playerInfo);
+            //PlayerInfo.Text = playerInfoS;
+            Invoke(() =>
+            {
+                PlayerInfo.Text = playerInfoS;
+            });
+            //PlayerInfo.Text = String.Join(Environment.NewLine, playerInfo);
+
             string[] fieldParts = parts.Where((source, index) => index >= 6).ToArray();
             fieldWidth = (fieldParts[0]).Length + 1;
             string field = String.Join('\0', fieldParts);
@@ -134,7 +151,7 @@ namespace ClientUI
             // connecto to the client in a new thread
             if (clientSocket != null)
             {
-                if(connectionTask != null)
+                if (connectionTask != null)
                 {
                     connectionCTokenSource.Cancel();
                     int count = Process.GetCurrentProcess().Threads.Count;
@@ -143,9 +160,69 @@ namespace ClientUI
                 // create a new CancellationTokenSource, from which I can get a new token to reset the cancelled status
                 connectionCTokenSource = new CancellationTokenSource();
                 connectionCToken = connectionCTokenSource.Token;
-                connectionTask = new Task(() => clientSocket.Connect(connectionCToken), connectionCToken);
-                connectionTask.Start();
+                try
+                {
+                    connectionTask = new Task(() => clientSocket.Connect(connectionCToken), connectionCToken);
+                    connectionTask.Start();
+                }
+                catch { }
             }
+        }
+
+        // override the ProcessCmdKey so I can take keypress input from the user to play the game
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (clientSocket != null && clientSocket.client.Connected)
+            {
+                switch (keyData)
+                {
+                    case Keys.Escape:
+                        {
+                            string inp = Enum.GetName(typeof(Input), Input.quit);
+                            string inpE = clientSocket.DataSecurity.EncryptAES(inp);
+                            clientSocket.SendMessage(inpE);
+                            clientSocket.Close();
+                        }
+                        break;
+                    case Keys.Q:
+                        {
+                            string inp = Enum.GetName(typeof(Input), Input.quit);
+                            string inpE = clientSocket.DataSecurity.EncryptAES(inp);
+                            clientSocket.SendMessage(inpE);
+                        }
+                        break;
+                    case Keys.Up:
+                        {
+                            string inp = Enum.GetName(typeof(Input), Input.up);
+                            string inpE = clientSocket.DataSecurity.EncryptAES(inp);
+                            clientSocket.SendMessage(inpE);
+                        }
+                        break;
+                    case Keys.Right:
+                        {
+                            string inp = Enum.GetName(typeof(Input), Input.right);
+                            string inpE = clientSocket.DataSecurity.EncryptAES(inp);
+                            clientSocket.SendMessage(inpE);
+                        }
+                        break;
+                    case Keys.Down:
+                        {
+                            string inp = Enum.GetName(typeof(Input), Input.down);
+                            string inpE = clientSocket.DataSecurity.EncryptAES(inp);
+                            clientSocket.SendMessage(inpE);
+                        }
+                        break;
+                    case Keys.Left:
+                        {
+                            string inp = Enum.GetName(typeof(Input), Input.left);
+                            string inpE = clientSocket.DataSecurity.EncryptAES(inp);
+                            clientSocket.SendMessage(inpE);
+                        }
+                        break;
+                }
+                Thread.Sleep(050);
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
     }
 }

@@ -18,10 +18,12 @@ namespace ClientUI.Client
 
 
         // data security class for keys
-        DataSecurity dataSecurity;
+        private DataSecurity dataSecurity;
 
         // reference to the form
-        ClientUIForm form;
+        private ClientUIForm form;
+
+        internal DataSecurity DataSecurity => dataSecurity;
 
         internal ClientSocket(string host, int port, ClientUIForm form)
         {
@@ -39,8 +41,18 @@ namespace ClientUI.Client
 
         internal void Connect(CancellationToken ct)
         {
-            client.Connect(remoteEp);
+            try
+            {
+                client.Connect(remoteEp);
+            }
+            catch {
+                return;
+            }
             SetupPlayer();
+            form.Invoke(() =>
+            {
+                form.Text = form.standText + " - Connected!";
+            });
 
             while(true)
             {
@@ -55,11 +67,14 @@ namespace ClientUI.Client
                     {
                         string decrypted = dataSecurity.DecryptAES(data);
                         form.SetupField(decrypted); 
-                        //break;
                     }
                 }
                 catch
                 {
+                    form.Invoke(() =>
+                    {
+                        form.Text = form.standText;
+                    });
                     client.Shutdown(SocketShutdown.Both);
                     break;
                 }
@@ -116,6 +131,10 @@ namespace ClientUI.Client
 
         internal void Close()
         {
+            form.Invoke(() =>
+            {
+                form.Text = form.standText;
+            });
             client.Disconnect(false);
         }
     }

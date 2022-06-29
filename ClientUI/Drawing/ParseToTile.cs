@@ -81,6 +81,7 @@ namespace ClientUI.Drawing
             Tile doorTile = Parse("door", 0, 1, tileSize);
             Tile healTile = Parse("healpot", 0, 1, tileSize);
             Tile xpTile = Parse("xppot", 0, 1, tileSize);
+            Tile flagTile = Parse("flag", 0, 1, tileSize);
 
             // now turn the text int a list of tiles
             for (int i = 0; i < text.Length; i++)
@@ -136,6 +137,10 @@ namespace ClientUI.Drawing
                     case '&':
                         t = new Tile(xpTile);
                         break;
+                    // flag
+                    case '!':
+                        t = new Tile(flagTile);
+                        break;
                 }
 
                 if (t == null)
@@ -150,7 +155,6 @@ namespace ClientUI.Drawing
                 t.placement.X = x * tileSize;
                 t.placement.Y = y * tileSize;
                 tiles.Add(t);
-
             }
             return tiles;
         }
