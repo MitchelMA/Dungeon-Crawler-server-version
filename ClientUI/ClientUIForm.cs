@@ -2,6 +2,7 @@
 using System.Drawing.Drawing2D;
 using ClientUI.Drawing;
 using ClientUI.Client;
+using System.Diagnostics;
 
 namespace ClientUI
 {
@@ -24,7 +25,9 @@ namespace ClientUI
         private int tileSize = 16;
 
         // other threads
-        Task connectionThread;
+        Task connectionTask;
+        CancellationTokenSource connectionCTokenSource = new CancellationTokenSource();
+        CancellationToken connectionCToken;
         public ClientUIForm()
         {
             InitializeComponent();
@@ -39,6 +42,9 @@ namespace ClientUI
             // create the parser
             tileParser = factory.Create(spriteMapperFileName);
 
+            // get a cancellation token for the connectionTask;
+            connectionCToken = connectionCTokenSource.Token;
+
             // reading from a spritesheet or "bitmap" is weird: you need uneven, preceding cords for the x-axis
             // for instance, if you want to have sprite with an x-cord of `22`, your input x-cord should be `21`
             // why? I don't know, that's just how it works or something?
@@ -50,6 +56,13 @@ namespace ClientUI
 
         private void ClientUIForm_FormClosing(object? sender, FormClosingEventArgs e)
         {
+            // try to formally dispose the task
+            try
+            {
+                connectionCTokenSource.Cancel();
+                connectionTask.Dispose();
+            }
+            catch { };
             clientSocket.Close();
         }
 
@@ -80,73 +93,9 @@ namespace ClientUI
             string[] playerInfo = parts.Where((source, index) => index < 6).ToArray();
             string[] fieldParts = parts.Where((source, index) => index >= 6).ToArray();
             fieldWidth = (fieldParts[0]).Length + 1;
-            // clear the tiles
-            tiles.Clear();
             string field = String.Join('\0', fieldParts);
-
-            // presets for the types of tiles
-            Tile floorTile = tileParser.Parse("floor", 0, 1, tileSize);
-            Tile monsterTile = tileParser.Parse("monster", 0, 1, tileSize);
-            Tile playerTile = tileParser.Parse("player", 0, 1, tileSize);
-            Tile otherPlayerTile = tileParser.Parse("otherp", 0, 1, tileSize);
-            Tile wallTile = tileParser.Parse("wallH", 0, 1, tileSize);
-            Tile cornerTile = tileParser.Parse("cornerTR", 0, 1, tileSize);
-
-            // now turn the field int a list of tiles
-            for (int i = 0; i < field.Length; i++)
-            {
-                Tile t = null;
-                // optimizing the code itself
-                if (field[i] == ' ')
-                {
-                    continue;
-                }
-                // now copy the pre-parsed tiles
-                switch (field[i])
-                {
-                    // floor-tile
-                    case '·':
-                        t = new Tile(floorTile);
-                        break;
-                    // monster-til
-                    case '@':
-                        t = new Tile(monsterTile);
-                        break;
-                    // player-tile
-                    case '¶':
-                        t = new Tile(playerTile);
-                        break;
-                    // other-player-tile
-                    case '?':
-                        t = new Tile(otherPlayerTile);
-                        break;
-                    // walls
-                    case '│':
-                    case '─':
-                        t = new Tile(wallTile);
-                        break;
-                    // corner tiles
-                    case '┐':
-                    case '┌':
-                    case '└':
-                    case '┘':
-                        t = new Tile(cornerTile);
-                        break;
-                }
-
-                if (t == null)
-                {
-                    continue;
-                }
-
-                // set the correct cords of the pre-parsed copy
-                int x = i % fieldWidth;
-                int y = i / fieldWidth;
-
-                t.placement.X = x * tileSize;
-                t.placement.Y = y * tileSize;
-                tiles.Add(t);
-            }
+            // set the new values of the tiles
+            tiles = tileParser.ParseText(field, fieldWidth, 16);
             Console.WriteLine("Debug Six");
             // now invalidate the canvas to force it to paint again
             Invalidate();
@@ -185,8 +134,17 @@ namespace ClientUI
             // connecto to the client in a new thread
             if (clientSocket != null)
             {
-                connectionThread = new Task(clientSocket.Connect);
-                connectionThread.Start();
+                if(connectionTask != null)
+                {
+                    connectionCTokenSource.Cancel();
+                    int count = Process.GetCurrentProcess().Threads.Count;
+                    Console.WriteLine(count);
+                }
+                // create a new CancellationTokenSource, from which I can get a new token to reset the cancelled status
+                connectionCTokenSource = new CancellationTokenSource();
+                connectionCToken = connectionCTokenSource.Token;
+                connectionTask = new Task(() => clientSocket.Connect(connectionCToken), connectionCToken);
+                connectionTask.Start();
             }
         }
     }

@@ -37,13 +37,17 @@ namespace ClientUI.Client
             client = new Socket(iPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         }
 
-        internal void Connect()
+        internal void Connect(CancellationToken ct)
         {
             client.Connect(remoteEp);
             SetupPlayer();
 
             while(true)
             {
+                if(ct.IsCancellationRequested)
+                {
+                    break;
+                }
                 try
                 {
                     string data = GetMessage();
