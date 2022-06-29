@@ -25,7 +25,7 @@ namespace ClientUI.Drawing
             foreach (string line in lines)
             {
                 // split the lines
-                string[] lineParts = line.Trim().Split(';');
+                string[] lineParts = line.Trim().Split(',');
                 // create a new instance of a TileSrcLocation
                 TileSrcLocation srcLoc = new TileSrcLocation(
                     new Point(int.Parse(lineParts[2].Trim()), int.Parse(lineParts[3].Trim())),
