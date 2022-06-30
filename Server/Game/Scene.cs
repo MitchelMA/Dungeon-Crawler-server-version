@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text.Json;
@@ -29,6 +30,7 @@ namespace Server.Game
 
         // items in the scene (players count too)
         private List<Player> players;
+        private Mutex playerListMutex = new Mutex();
         private List<Door> doors;
         private List<Monster> monsters;
         private List<HealingBottle> healingBottles;
@@ -224,7 +226,18 @@ namespace Server.Game
             // make sure no doubles end up in the list of players
             if (players.Contains(player))
                 return false;
+            // use the mutex to be able to safely add the player
+            playerListMutex.WaitOne();
+            Console.ForegroundColor = ServerSocket.mutexInfoColor;
+            Console.WriteLine("Entered protected area to add player to scene");
+            Console.ForegroundColor = ServerSocket.standColor;
+            // add the player to the list in the protected area
             players.Add(player);
+            // now release the mutex so it can be used again
+            Console.ForegroundColor = ServerSocket.mutexInfoColor;
+            Console.WriteLine("Releasing mutex after adding player to scene");
+            Console.ForegroundColor = ServerSocket.standColor;
+            playerListMutex.ReleaseMutex();
             return true;
         }
         /// <summary>
@@ -236,7 +249,19 @@ namespace Server.Game
         /// <b>False</b> - when the player wasn't removed</returns>
         internal bool RemovePlayerFromScene(Player player)
         {
-            return players.Remove(player);
+            // use the mutex to enter a protected area
+            playerListMutex.WaitOne();
+            Console.ForegroundColor = ServerSocket.mutexInfoColor;
+            Console.WriteLine("Entered protected area to remove player from scene");
+            Console.ForegroundColor = ServerSocket.standColor;
+            // now remove the player from the list of players in the protected area
+            bool removed = players.Remove(player);
+            // now release the mutex to leave the protected area
+            Console.ForegroundColor = ServerSocket.mutexInfoColor;
+            Console.WriteLine("Releasing mutex after removing player from scene");
+            Console.ForegroundColor = ServerSocket.standColor;
+            playerListMutex.ReleaseMutex();
+            return removed;
         }
 
         /// <summary>
@@ -250,6 +275,11 @@ namespace Server.Game
             List<Player> disconnected = UpdateStatus();
             // after knowing which players got disconnected,
             // only update the connected players
+            // wait on the mutex to safely loop through all the players in the scene
+            playerListMutex.WaitOne();
+            Console.ForegroundColor = ServerSocket.mutexInfoColor;
+            Console.WriteLine("Entered protected area to loop through all the players in the scene");
+            Console.ForegroundColor = ServerSocket.standColor;
             foreach (Player player in players)
             {
                 // don't send any messages to disconnected players
@@ -276,6 +306,12 @@ namespace Server.Game
                     Console.ForegroundColor = ServerSocket.standColor;
                 }
             }
+
+            // at the end of the loop, release the mutex to exit the protected area
+            Console.ForegroundColor = ServerSocket.mutexInfoColor;
+            Console.WriteLine("Releasing mutex after looping through players in the scene");
+            Console.ForegroundColor = ServerSocket.standColor;
+            playerListMutex.ReleaseMutex();
             // at the end, return all the disconnected, so the server knows which one to clean up
             return disconnected;
         }
@@ -289,6 +325,11 @@ namespace Server.Game
         {
             List<Player> disconnected = new List<Player>();
             // first, check for disconnected
+            // use the mutex so we know for sure that the list of players cannot be changed while in this loop
+            playerListMutex.WaitOne();
+            Console.ForegroundColor = ServerSocket.mutexInfoColor;
+            Console.WriteLine("Entered protected area to loop through all the players in the scene");
+            Console.ForegroundColor = ServerSocket.standColor;
             foreach (Player player in players)
             {
                 try
@@ -314,6 +355,11 @@ namespace Server.Game
                     disconnected.Add(player);
                 }
             }
+            // after this loop, we can exit the protected area by releasing the mutex
+            Console.ForegroundColor = ServerSocket.mutexInfoColor;
+            Console.WriteLine("Releasing mutex after looping through all the players in the scene");
+            Console.ForegroundColor = ServerSocket.standColor;
+            playerListMutex.ReleaseMutex();
             // then remove all the disconnected
             foreach (Player disconnect in disconnected)
             {

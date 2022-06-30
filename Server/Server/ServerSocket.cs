@@ -21,6 +21,7 @@ namespace Server.Server
 
         private readonly Socket listener;
         private List<Player> players;
+        private Mutex playerListMutex = new Mutex();
         private Dictionary<string, Scene> scenes;
         private readonly IPEndPoint endPoint;
 
@@ -31,6 +32,7 @@ namespace Server.Server
         internal static readonly ConsoleColor errColor = ConsoleColor.Red;
         internal static readonly ConsoleColor connColor = ConsoleColor.Green;
         internal static readonly ConsoleColor disconnColor = ConsoleColor.Blue;
+        internal static readonly ConsoleColor mutexInfoColor = ConsoleColor.Cyan;
 
         // info about the game, for instance: the reference.json
         private Reference gameReference;
@@ -300,7 +302,7 @@ namespace Server.Server
 
             foreach (Player disconnect in disconnected)
             {
-                players.Remove(disconnect);
+                RemovePlayer(disconnect);
                 try
                 {
                     disconnect.Socket.Shutdown(SocketShutdown.Both);
@@ -325,7 +327,7 @@ namespace Server.Server
             Console.WriteLine("Disconnected count: " + disconnected.Count);
             foreach (Player disconnect in disconnected)
             {
-                players.Remove(disconnect);
+                RemovePlayer(disconnect); 
                 try
                 {
                     disconnect.Socket.Shutdown(SocketShutdown.Both);
@@ -354,8 +356,40 @@ namespace Server.Server
             {
                 return false;
             }
+            // use the mutex to enter a protected area in which the player can be safely removed
+            playerListMutex.WaitOne();
+            Console.ForegroundColor = mutexInfoColor;
+            Console.WriteLine("Entered protected area to add player to server");
+            Console.ForegroundColor = standColor;
+
+            // now we can add the player
             players.Add(player);
+
+            // now exit the protected area by releasing the mutex
+            Console.ForegroundColor = mutexInfoColor;
+            Console.WriteLine("Releasing mutex after adding player to the server");
+            Console.ForegroundColor = standColor;
+            playerListMutex.ReleaseMutex();
             return true;
+        }
+
+        private bool RemovePlayer(Player player)
+        {
+            // use the mutex to enter the protected area to safely remove the player
+            playerListMutex.WaitOne();
+            Console.ForegroundColor = mutexInfoColor;
+            Console.WriteLine("Entered protected area to remove player from server");
+            Console.ForegroundColor = standColor;
+
+            // now that we entered the protected area, we can remove the player from the list of players
+            bool removed = players.Remove(player);
+
+            // after removing the player, we can exit the protected area by releasing the mutex
+            Console.ForegroundColor = mutexInfoColor;
+            Console.WriteLine("Releasing mutex after removing player from server");
+            Console.ForegroundColor = standColor;
+            playerListMutex.ReleaseMutex();
+            return removed;
         }
 
         private void CheckMove(int x, int y, Player player)
