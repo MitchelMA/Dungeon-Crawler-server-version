@@ -104,8 +104,8 @@ namespace ClientUI.Drawing
             Tile monsterTile = Parse("monster", 0, 1, tileSize);
             Tile playerTile = Parse("player", 0, 1, tileSize);
             Tile otherPlayerTile = Parse("otherp", 0, 1, tileSize);
-            Tile wallTile = Parse("wallH", 0, 1, tileSize);
-            Tile cornerTile = Parse("cornerTR", 0, 1, tileSize);
+            Tile wallTile = Parse("wallHorizontal", 0, 1, tileSize);
+            Tile cornerTile = Parse("cornerTopRight", 0, 1, tileSize);
             Tile doorTile = Parse("door", 0, 1, tileSize);
             Tile healTile = Parse("healpot", 0, 1, tileSize);
             Tile xpTile = Parse("xppot", 0, 1, tileSize);
