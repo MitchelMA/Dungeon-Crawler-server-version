@@ -257,11 +257,11 @@ namespace Server.Game
                 {
                     string message = "";
                     message += $"Position: {player.Position[0]}, {player.Position[1]}";
-                    message += $"\nScene: {player.Scene.Name}";
-                    message += $"\nLevel: {player.CurrentLvl}";
-                    message += $"\nDamage: {player.Damage[0]} - {player.Damage[1]}";
-                    message += $"\nHP: {player.CurrentHp}/{player.MaxHp}";
-                    message += $"\nXP: {player.CurrentXp}/{player.XpNecUp * player.CurrentLvl}\n";
+                    message += $"{Environment.NewLine}Scene: {player.Scene.Name}";
+                    message += $"{Environment.NewLine}Level: {player.CurrentLvl}";
+                    message += $"{Environment.NewLine}Damage: {player.Damage[0]} - {player.Damage[1]}";
+                    message += $"{Environment.NewLine}HP: {player.CurrentHp}/{player.MaxHp}";
+                    message += $"{Environment.NewLine}XP: {player.CurrentXp}/{player.XpNecUp * player.CurrentLvl}{Environment.NewLine}";
                     message += GameField(player);
                     // first encrypt the message with the symmetric key
                     string encryptedM = ServerSocket.DataSecurity.EncryptAES(message);
