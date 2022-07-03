@@ -65,7 +65,7 @@ namespace ClientUI
             // for instance, if you want to have sprite with an x-cord of `22`, your input x-cord should be `21`
             // why? I don't know, that's just how it works or something?
             spriteSheet = Bitmap.FromFile(Path.Combine(exeDir, "sprites.png"));
-            this.Text = standText;
+            Text = standText;
             DoubleBuffered = true;
             FormClosing += ClientUIForm_FormClosing;
         }
@@ -170,6 +170,7 @@ namespace ClientUI
                 // create a new CancellationTokenSource, from which I can get a new token to reset the cancelled status
                 connectionCTokenSource = new CancellationTokenSource();
                 connectionCToken = connectionCTokenSource.Token;
+                Thread.Sleep(10);
                 try
                 {
                     connectionTask = new Task(() => clientSocket.Connect(connectionCToken), connectionCToken);

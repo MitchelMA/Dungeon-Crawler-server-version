@@ -334,8 +334,8 @@ namespace Server.Game
             {
                 try
                 {
-                    bool connected = player.Socket.Poll(1000, System.Net.Sockets.SelectMode.SelectRead);
-                    if (connected)
+                    bool connected = !(player.Socket.Poll(1, System.Net.Sockets.SelectMode.SelectRead) && player.Socket.Available == 0);
+                    if (!connected)
                     {
                         Console.ForegroundColor = ServerSocket.disconnColor;
                         Console.WriteLine("Disconnection found");
