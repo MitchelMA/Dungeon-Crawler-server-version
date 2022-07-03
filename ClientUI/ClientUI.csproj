@@ -19,11 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="TileMaps\Blue.csv" />
-    <None Remove="TileMaps\Red.csv" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 

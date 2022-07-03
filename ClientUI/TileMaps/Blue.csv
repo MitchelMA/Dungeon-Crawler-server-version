@@ -8,9 +8,9 @@ cornerTopRight    ,┐,43,16,16,16
 cornerTopLeft     ,┌,43,16,16,16
 cornerBottomRight ,┘,43,16,16,16
 cornerBottomLeft  ,└,43,16,16,16
-door              ,$,65,32,16,16
-healpot           ,+,87,32,16,16
-xppot             ,&,109,32,16,16
-flag              ,!,131,32,16,16
-trap              ,*,21,32,16,16
-active-trap       ,#,43,32,16,16
+door              ,$,65,16,16,16
+healpot           ,+,87,16,16,16
+xppot             ,&,109,16,16,16
+flag              ,!,131,16,16,16
+trap              ,*,21,16,16,16
+active-trap       ,#,43,16,16,16
