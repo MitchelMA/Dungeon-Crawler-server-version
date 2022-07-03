@@ -12,8 +12,9 @@ namespace ClientUI
         internal Image spriteSheet;
         internal int topPadding = 32;
         internal string standText = "Client";
-        internal readonly string spriteMapperFileName;
+        internal readonly string[] spriteMapperFileName;
         internal ParseToTile tileParser;
+        private ParseToTileFactory parserFactory;
 
         private readonly string tileDirectory;
         private readonly string exeDir = PathHelper.ExeDir;
@@ -38,11 +39,23 @@ namespace ClientUI
             tileDirectory = Path.Combine(exeDir, @".\TileMaps\");
 
             // use a factory to load in the data of the current tilemap
-            ParseToTileFactory factory = new ParseToTileFactory();
-            spriteMapperFileName = factory.Load(tileDirectory);
+            parserFactory = new ParseToTileFactory();
+            spriteMapperFileName = parserFactory.Load(tileDirectory);
 
             // create the parser
-            tileParser = factory.Create(spriteMapperFileName);
+            tileParser = parserFactory.Create(spriteMapperFileName[0]);
+
+            // now create a dropdown at the theme menu-strip-item
+            ThemeTSMI.DropDownItems.Clear();
+            foreach(string filename in spriteMapperFileName)
+            {
+                ToolStripMenuItem dropItem = new ToolStripMenuItem();
+                dropItem.Text = filename;
+                dropItem.Name = filename + "TSMI";
+                dropItem.Size = new Size(102, 22);
+                dropItem.Click += new EventHandler(this.DropItem_Click);
+                ThemeTSMI.DropDownItems.Add(dropItem);
+            }
 
             // get a cancellation token for the tasks
             connectionCToken = connectionCTokenSource.Token;
@@ -161,6 +174,15 @@ namespace ClientUI
                     connectionTask.Start();
                 }
                 catch { }
+            }
+        }
+
+        private void DropItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem btn = (ToolStripMenuItem)sender;
+            if(Array.IndexOf(spriteMapperFileName, btn.Text) != -1)
+            {
+                tileParser = parserFactory.Create(btn.Text);
             }
         }
 

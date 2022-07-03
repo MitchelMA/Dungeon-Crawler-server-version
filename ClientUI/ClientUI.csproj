@@ -19,7 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="TileMaps\stand.csv" />
+    <None Remove="TileMaps\Blue.csv" />
+    <None Remove="TileMaps\Red.csv" />
   </ItemGroup>
 
   <ItemGroup>
