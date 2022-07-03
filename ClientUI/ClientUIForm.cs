@@ -166,6 +166,7 @@ namespace ClientUI
                 {
                     connectionCTokenSource.Cancel();
                 }
+
                 // create a new CancellationTokenSource, from which I can get a new token to reset the cancelled status
                 connectionCTokenSource = new CancellationTokenSource();
                 connectionCToken = connectionCTokenSource.Token;
@@ -206,7 +207,7 @@ namespace ClientUI
                                 string inp = Enum.GetName(typeof(Input), Input.quit);
                                 string inpE = clientSocket.DataSecurity.EncryptAES(inp);
                                 clientSocket.SendMessage(inpE);
-                                clientSocket.Close();
+                                connectionCTokenSource.Cancel();
                                 ClearScreen();
                             }
                             break;
@@ -215,7 +216,7 @@ namespace ClientUI
                                 string inp = Enum.GetName(typeof(Input), Input.quit);
                                 string inpE = clientSocket.DataSecurity.EncryptAES(inp);
                                 clientSocket.SendMessage(inpE);
-                                clientSocket.Close();
+                                connectionCTokenSource.Cancel();
                                 ClearScreen();
                             }
                             break;

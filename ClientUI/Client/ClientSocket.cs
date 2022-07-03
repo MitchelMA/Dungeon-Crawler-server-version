@@ -58,6 +58,7 @@ namespace ClientUI.Client
             {
                 if(ct.IsCancellationRequested)
                 {
+                    Close();
                     break;
                 }
                 try
@@ -71,11 +72,7 @@ namespace ClientUI.Client
                 }
                 catch
                 {
-                    form.Invoke(() =>
-                    {
-                        form.Text = form.standText;
-                    });
-                    client.Shutdown(SocketShutdown.Both);
+                    Close();
                     break;
                 }
             }
