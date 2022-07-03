@@ -34,6 +34,8 @@
             this.IPAddressTSTB = new System.Windows.Forms.ToolStripTextBox();
             this.PortMI = new System.Windows.Forms.ToolStripMenuItem();
             this.PortTSTB = new System.Windows.Forms.ToolStripTextBox();
+            this.ThemeTSMI = new System.Windows.Forms.ToolStripMenuItem();
+            this.mooiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ConnectBtn = new System.Windows.Forms.Button();
             this.PlayerInfoL = new System.Windows.Forms.Label();
             this.ConnectionMenuStrip.SuspendLayout();
@@ -46,7 +48,8 @@
             this.IPAddressMI,
             this.IPAddressTSTB,
             this.PortMI,
-            this.PortTSTB});
+            this.PortTSTB,
+            this.ThemeTSMI});
             this.ConnectionMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.ConnectionMenuStrip.Name = "ConnectionMenuStrip";
             this.ConnectionMenuStrip.Size = new System.Drawing.Size(799, 27);
@@ -75,12 +78,26 @@
             this.PortTSTB.Name = "PortTSTB";
             this.PortTSTB.Size = new System.Drawing.Size(101, 23);
             // 
+            // ThemeTSMI
+            // 
+            this.ThemeTSMI.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mooiToolStripMenuItem});
+            this.ThemeTSMI.Name = "ThemeTSMI";
+            this.ThemeTSMI.Size = new System.Drawing.Size(55, 23);
+            this.ThemeTSMI.Text = "Theme";
+            // 
+            // mooiToolStripMenuItem
+            // 
+            this.mooiToolStripMenuItem.Name = "mooiToolStripMenuItem";
+            this.mooiToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
+            this.mooiToolStripMenuItem.Text = "Mooi";
+            // 
             // ConnectBtn
             // 
-            this.ConnectBtn.Location = new System.Drawing.Point(349, 0);
+            this.ConnectBtn.Location = new System.Drawing.Point(400, 0);
             this.ConnectBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ConnectBtn.Name = "ConnectBtn";
-            this.ConnectBtn.Size = new System.Drawing.Size(80, 28);
+            this.ConnectBtn.Size = new System.Drawing.Size(90, 28);
             this.ConnectBtn.TabIndex = 1;
             this.ConnectBtn.Text = "Connect";
             this.ConnectBtn.UseVisualStyleBackColor = true;
@@ -128,5 +145,7 @@
         private ToolStripTextBox PortTSTB;
         private Button ConnectBtn;
         private Label PlayerInfoL;
+        private ToolStripMenuItem ThemeTSMI;
+        private ToolStripMenuItem mooiToolStripMenuItem;
     }
 }

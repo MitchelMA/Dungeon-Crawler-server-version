@@ -12,8 +12,9 @@ namespace ClientUI
         internal Image spriteSheet;
         internal int topPadding = 32;
         internal string standText = "Client";
-        internal readonly string spriteMapperFileName;
+        internal readonly string[] spriteMapperFileName;
         internal ParseToTile tileParser;
+        private ParseToTileFactory parserFactory;
 
         private readonly string tileDirectory;
         private readonly string exeDir = PathHelper.ExeDir;
@@ -38,11 +39,24 @@ namespace ClientUI
             tileDirectory = Path.Combine(exeDir, @".\TileMaps\");
 
             // use a factory to load in the data of the current tilemap
-            ParseToTileFactory factory = new ParseToTileFactory();
-            spriteMapperFileName = factory.Load(tileDirectory);
+            parserFactory = new ParseToTileFactory();
+            spriteMapperFileName = parserFactory.Load(tileDirectory);
+
+            // now create a dropdown at the theme menu-strip-item
+            ThemeTSMI.DropDownItems.Clear();
+            foreach(string filename in spriteMapperFileName)
+            {
+                ToolStripMenuItem dropItem = new ToolStripMenuItem();
+                dropItem.Text = filename;
+                dropItem.Name = filename + "TSMI";
+                dropItem.Size = new Size(102, 22);
+                dropItem.Click += new EventHandler(this.DropItem_Click);
+                ThemeTSMI.DropDownItems.Add(dropItem);
+            }
 
             // create the parser
-            tileParser = factory.Create(spriteMapperFileName);
+            ThemeTSMI.DropDownItems[0].PerformClick();
+
 
             // get a cancellation token for the tasks
             connectionCToken = connectionCTokenSource.Token;
@@ -111,7 +125,7 @@ namespace ClientUI
             fieldWidth = (fieldParts[0]).Length + 1;
             string field = String.Join('\0', fieldParts);
             // set the new values of the tiles
-            tiles = tileParser.ParseTextNew(field, fieldWidth, 16);
+            tiles = tileParser.ParseTextNew(field, fieldWidth, tileSize);
             // now invalidate the canvas to force it to paint again
             Invalidate();
         }
@@ -152,6 +166,7 @@ namespace ClientUI
                 {
                     connectionCTokenSource.Cancel();
                 }
+
                 // create a new CancellationTokenSource, from which I can get a new token to reset the cancelled status
                 connectionCTokenSource = new CancellationTokenSource();
                 connectionCToken = connectionCTokenSource.Token;
@@ -164,61 +179,79 @@ namespace ClientUI
             }
         }
 
+        private void DropItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem btn = (ToolStripMenuItem)sender;
+            if(Array.IndexOf(spriteMapperFileName, btn.Text) != -1)
+            {
+                foreach(ToolStripMenuItem item in ThemeTSMI.DropDownItems)
+                {
+                    item.Checked = false;
+                }
+                btn.Checked = true;
+                tileParser = parserFactory.Create(btn.Text);
+            }
+        }
+
         // override the ProcessCmdKey so I can take keypress input from the user to play the game
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (clientSocket != null && clientSocket.client.Connected)
             {
-                switch (keyData)
+                try
                 {
-                    case Keys.Escape:
-                        {
-                            string inp = Enum.GetName(typeof(Input), Input.quit);
-                            string inpE = clientSocket.DataSecurity.EncryptAES(inp);
-                            clientSocket.SendMessage(inpE);
-                            clientSocket.Close();
-                            ClearScreen();
-                        }
-                        break;
-                    case Keys.Q:
-                        {
-                            string inp = Enum.GetName(typeof(Input), Input.quit);
-                            string inpE = clientSocket.DataSecurity.EncryptAES(inp);
-                            clientSocket.SendMessage(inpE);
-                            clientSocket.Close();
-                            ClearScreen();
-                        }
-                        break;
-                    case Keys.Up:
-                        {
-                            string inp = Enum.GetName(typeof(Input), Input.up);
-                            string inpE = clientSocket.DataSecurity.EncryptAES(inp);
-                            clientSocket.SendMessage(inpE);
-                        }
-                        break;
-                    case Keys.Right:
-                        {
-                            string inp = Enum.GetName(typeof(Input), Input.right);
-                            string inpE = clientSocket.DataSecurity.EncryptAES(inp);
-                            clientSocket.SendMessage(inpE);
-                        }
-                        break;
-                    case Keys.Down:
-                        {
-                            string inp = Enum.GetName(typeof(Input), Input.down);
-                            string inpE = clientSocket.DataSecurity.EncryptAES(inp);
-                            clientSocket.SendMessage(inpE);
-                        }
-                        break;
-                    case Keys.Left:
-                        {
-                            string inp = Enum.GetName(typeof(Input), Input.left);
-                            string inpE = clientSocket.DataSecurity.EncryptAES(inp);
-                            clientSocket.SendMessage(inpE);
-                        }
-                        break;
+                    switch (keyData)
+                    {
+                        case Keys.Escape:
+                            {
+                                string inp = Enum.GetName(typeof(Input), Input.quit);
+                                string inpE = clientSocket.DataSecurity.EncryptAES(inp);
+                                clientSocket.SendMessage(inpE);
+                                connectionCTokenSource.Cancel();
+                                ClearScreen();
+                            }
+                            break;
+                        case Keys.Q:
+                            {
+                                string inp = Enum.GetName(typeof(Input), Input.quit);
+                                string inpE = clientSocket.DataSecurity.EncryptAES(inp);
+                                clientSocket.SendMessage(inpE);
+                                connectionCTokenSource.Cancel();
+                                ClearScreen();
+                            }
+                            break;
+                        case Keys.Up:
+                            {
+                                string inp = Enum.GetName(typeof(Input), Input.up);
+                                string inpE = clientSocket.DataSecurity.EncryptAES(inp);
+                                clientSocket.SendMessage(inpE);
+                            }
+                            break;
+                        case Keys.Right:
+                            {
+                                string inp = Enum.GetName(typeof(Input), Input.right);
+                                string inpE = clientSocket.DataSecurity.EncryptAES(inp);
+                                clientSocket.SendMessage(inpE);
+                            }
+                            break;
+                        case Keys.Down:
+                            {
+                                string inp = Enum.GetName(typeof(Input), Input.down);
+                                string inpE = clientSocket.DataSecurity.EncryptAES(inp);
+                                clientSocket.SendMessage(inpE);
+                            }
+                            break;
+                        case Keys.Left:
+                            {
+                                string inp = Enum.GetName(typeof(Input), Input.left);
+                                string inpE = clientSocket.DataSecurity.EncryptAES(inp);
+                                clientSocket.SendMessage(inpE);
+                            }
+                            break;
+                    }
+                    Thread.Sleep(050);
                 }
-                Thread.Sleep(050);
+                catch { }
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
