@@ -1,0 +1,18 @@
+﻿{
+  "Tutorial Level": {
+    "forced-theme": "Red",
+    "injection":  ["m,00,16,16,16"],
+    "data": [
+      {
+        "position": [ 2, 2 ],
+        "block-rules": [
+          [ "·", "Brown" ]
+        ]
+      }
+    ]
+  },
+  "Test level": {
+    "forced-theme": "Blue",
+    "injection": [ "m,00,00,16,16" ]
+  }
+}

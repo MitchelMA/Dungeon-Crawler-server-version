@@ -129,6 +129,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "ClientUIForm";
             this.Text = "Client";
+            this.Load += new System.EventHandler(this.ClientUIForm_Load);
             this.ConnectionMenuStrip.ResumeLayout(false);
             this.ConnectionMenuStrip.PerformLayout();
             this.ResumeLayout(false);

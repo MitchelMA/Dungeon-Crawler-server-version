@@ -9,13 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="sprites.png">
+    <None Update="sprites-assets\sprites.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
 	  <!-- Copy's the whole `TileMaps` directory and all its content -->
 	  <Content Include="TileMaps\**">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="TileMaps\SceneRules.json" />
   </ItemGroup>
 
   <ItemGroup>

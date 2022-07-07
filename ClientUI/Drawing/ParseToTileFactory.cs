@@ -20,7 +20,6 @@ namespace ClientUI.Drawing
                 // open the filenames that were include by the file from the filePath
                 string[] lines = File.ReadAllLines(Path.Combine(pathName, file) + ".csv");
                 // create new instances for the dictionaries that will get used by the parsers
-                Dictionary<string, TileSrcLocation> names = new Dictionary<string, TileSrcLocation>();
                 Dictionary<char, TileSrcLocation> chars = new Dictionary<char, TileSrcLocation>();
 
                 // parse the .csv file to a dictionary
@@ -30,18 +29,37 @@ namespace ClientUI.Drawing
                     string[] lineParts = line.Trim().Split(',');
                     // create a new instance of a TileSrcLocation
                     TileSrcLocation srcLoc = new TileSrcLocation(
-                        new Point(int.Parse(lineParts[2].Trim()), int.Parse(lineParts[3].Trim())),
-                        new Point(int.Parse(lineParts[4].Trim()), int.Parse(lineParts[5].Trim())));
+                        new Point(int.Parse(lineParts[1].Trim()), int.Parse(lineParts[2].Trim())),
+                        new Point(int.Parse(lineParts[3].Trim()), int.Parse(lineParts[4].Trim())));
 
                     // add this TileSrcLocation to both the dictionaries
-                    names.Add(lineParts[0].Trim(), srcLoc);
-                    chars.Add(lineParts[1].Trim()[0], srcLoc);
+                    chars.Add(lineParts[0].Trim()[0], srcLoc);
                 }
                 // create a new parser with the data of the dictionaries
-                ParseToTile tmp = new ParseToTile(chars, names);
+                ParseToTile tmp = new ParseToTile(chars);
                 parsers.Add(file, tmp);
             }
             return files;
+        }
+
+        internal ParseToTile Load(string[] parseText)
+        {
+            Dictionary<char, TileSrcLocation> chars = new Dictionary<char, TileSrcLocation>();
+            if(parseText == null)
+            {
+                return new ParseToTile(chars);
+            }
+            foreach(string line in parseText)
+            {
+                string[] lineParts = line.Trim().Split(',');
+                TileSrcLocation srcLoc = new TileSrcLocation(
+                   new Point(int.Parse(lineParts[1].Trim()), int.Parse(lineParts[2].Trim())),
+                   new Point(int.Parse(lineParts[3].Trim()), int.Parse(lineParts[4].Trim())));
+
+                chars.Add(lineParts[0].Trim()[0], srcLoc);
+            }
+
+            return new ParseToTile(chars);
         }
         // creates a new instance of a perser with a blueprint
         internal ParseToTile Create(string name)
