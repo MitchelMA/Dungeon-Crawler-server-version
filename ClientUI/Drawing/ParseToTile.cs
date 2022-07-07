@@ -47,6 +47,32 @@ namespace ClientUI.Drawing
             }
         }
 
+        internal void Combine(ParseToTile other)
+        {
+            foreach(KeyValuePair<char, TileSrcLocation> kvp in other.charTiles)
+            {
+                // overwrite the old value if it already existed
+                if(charTiles.TryGetValue(kvp.Key, out _))
+                {
+                    charTiles.Remove(kvp.Key);
+                    charTiles.Add(kvp.Key, kvp.Value);
+                }
+                // if not, add it
+                else
+                {
+                    charTiles.Add(kvp.Key, kvp.Value);
+                }
+            }
+
+            // now rearrange the charIndex and tileIndex array's
+            charIndex = charTiles.Keys.ToArray();
+            tileIndex = new Tile[charIndex.Length];
+            for (int i = 0; i < charIndex.Length; i++)
+            {
+                tileIndex[i] = Parse(charIndex[i], 0, 1, 16);
+            }
+        }
+
         internal Tile Parse(char character, int stringIndex, int stringWidth, int tileSize)
         {
             // get the src location from the charlist
@@ -64,7 +90,7 @@ namespace ClientUI.Drawing
             return new Tile(placement, sprite);
         }
 
-        internal static List<Tile> ParseTextNew(string text, int textWidth, int tileSize, TileRules extraRules, ParseToTileFactory referenceFactory, ParseToTile referenceParser, string sceneName)
+        internal static List<Tile> ParseText(string text, int textWidth, int tileSize, TileRules extraRules, ParseToTileFactory referenceFactory, ParseToTile referenceParser, string sceneName)
         {
             List<Tile> tiles = new List<Tile>();
 
@@ -84,6 +110,9 @@ namespace ClientUI.Drawing
                 {
                     secondary = referenceFactory.Create(currentSceneRules.ForcedTheme);
                     hasForced = true;
+
+                    ParseToTile injected = referenceFactory.Load(currentSceneRules.Injection);
+                    secondary.Combine(injected);
                 }
                 catch { };
             }
@@ -174,6 +203,9 @@ namespace ClientUI.Drawing
                     {
                         secondary = referenceFactory.Create(currentSceneRules.ForcedTheme);
                         hasForced = true;
+
+                        ParseToTile injected = referenceFactory.Load(currentSceneRules.Injection);
+                        secondary.Combine(injected);
                     }
                     catch
                     {

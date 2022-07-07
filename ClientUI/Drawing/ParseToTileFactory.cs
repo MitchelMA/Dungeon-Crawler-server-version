@@ -48,6 +48,11 @@ namespace ClientUI.Drawing
             foreach(string line in parseText)
             {
                 string[] lineParts = line.Trim().Split(',');
+                TileSrcLocation srcLoc = new TileSrcLocation(
+                   new Point(int.Parse(lineParts[1].Trim()), int.Parse(lineParts[2].Trim())),
+                   new Point(int.Parse(lineParts[3].Trim()), int.Parse(lineParts[4].Trim())));
+
+                chars.Add(lineParts[0].Trim()[0], srcLoc);
             }
 
             return new ParseToTile(chars);

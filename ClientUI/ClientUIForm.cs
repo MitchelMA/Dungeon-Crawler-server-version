@@ -135,7 +135,7 @@ namespace ClientUI
             fieldWidth = (fieldParts[0]).Length + 1;
             string field = String.Join('\0', fieldParts);
             // set the new values of the tiles
-            tiles = ParseToTile.ParseTextNew(field, fieldWidth, tileSize, tileRules, parserFactory, tileParser, sceneName);
+            tiles = ParseToTile.ParseText(field, fieldWidth, tileSize, tileRules, parserFactory, tileParser, sceneName);
             // now invalidate the canvas to force it to paint again
             Invalidate();
         }

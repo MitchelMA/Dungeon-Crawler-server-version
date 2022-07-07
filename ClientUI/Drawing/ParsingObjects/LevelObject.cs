@@ -11,6 +11,8 @@ namespace ClientUI.Drawing.ParsingObjects
     {
         [JsonPropertyName("forced-theme")]
         public string ForcedTheme { get; set; }
+        [JsonPropertyName("injection")]
+        public string[] Injection { get; set; }
         [JsonPropertyName("data")]
         public BlockDataObject[] Data { get; set; }
     }
