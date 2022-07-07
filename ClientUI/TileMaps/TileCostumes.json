@@ -1,6 +1,7 @@
 ﻿{
-  "Test level": {
+  "Tutorial Level": {
     "forced-theme": "Red",
+    "injection": "floor, ·, 00,00,16,16",
     "data": [
       {
         "position": [ 0, 0 ],
@@ -9,9 +10,15 @@
         ]
       },
       {
-        "position": [ 1, 0 ],
+        "position": [ 2, 2 ],
         "block-rules": [
-          [ "─", "Green" ]
+          [ "·", "Brown" ]
+        ]
+      },
+      {
+        "position": [ 3, 2 ],
+        "block-rules": [
+          ["·", "00,00,16,16"]
         ]
       }
     ]

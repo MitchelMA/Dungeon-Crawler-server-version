@@ -121,6 +121,8 @@ namespace ClientUI
             // by definition, the gamefield starts at index 6
             // and all the player-info is before that
             string[] playerInfo = parts.Where((source, index) => index < 6).ToArray();
+            // get the name of the current scene
+            string sceneName = playerInfo[1].Split(':')[1].Trim();
             // display all the playerInfo
             string playerInfoS = String.Join(Environment.NewLine, playerInfo);
             // set the text with the invoke to run it in the main thread (this method gets called by another task)
@@ -133,7 +135,7 @@ namespace ClientUI
             fieldWidth = (fieldParts[0]).Length + 1;
             string field = String.Join('\0', fieldParts);
             // set the new values of the tiles
-            tiles = tileParser.ParseTextNew(field, fieldWidth, tileSize);
+            tiles = ParseToTile.ParseTextNew(field, fieldWidth, tileSize, tileRules, parserFactory, tileParser, sceneName);
             // now invalidate the canvas to force it to paint again
             Invalidate();
         }

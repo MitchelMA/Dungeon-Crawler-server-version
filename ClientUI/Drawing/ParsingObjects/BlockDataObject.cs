@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ClientUI.Drawing.ParsingObjects
 {
-    internal class DataObject
+    internal class BlockDataObject
     {
         [JsonPropertyName("position")]
         public int[] Position { get; set; }

@@ -3,41 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ClientUI.Drawing.ParsingObjects;
 
 namespace ClientUI.Drawing
 {
     internal class ParseToTile
     {
         internal Dictionary<char, TileSrcLocation> charTiles = new Dictionary<char, TileSrcLocation>();
-        internal Dictionary<string, TileSrcLocation> nameTiles = new Dictionary<string, TileSrcLocation>();
 
         private char[] charIndex;
         private Tile[] tileIndex;
 
-        internal ParseToTile(Dictionary<char, TileSrcLocation> charTiles, Dictionary<string, TileSrcLocation> nameTiles)
+        internal ParseToTile(Dictionary<char, TileSrcLocation> charTiles)
         {
             this.charTiles = charTiles;
-            this.nameTiles = nameTiles;
 
             // create the char and tile index corresponding to the dictionaries
             // this is usefull for faster parsing a bigger string
             charIndex = charTiles.Keys.ToArray();
             tileIndex = new Tile[charIndex.Length];
-            for(int i = 0; i < charIndex.Length; i++)
+            for (int i = 0; i < charIndex.Length; i++)
             {
-                tileIndex[i] = Parse(charIndex[i], 0, 1, 16); 
+                tileIndex[i] = Parse(charIndex[i], 0, 1, 16);
             }
         }
 
         internal ParseToTile(ParseToTile copy)
         {
-            // copy all the names
-            foreach (KeyValuePair<string, TileSrcLocation> kvp in copy.nameTiles)
-            {
-                TileSrcLocation tmp = new TileSrcLocation(kvp.Value);
-                nameTiles.Add(kvp.Key, tmp);
-            }
-
             // now copy all the chars
             foreach (KeyValuePair<char, TileSrcLocation> kvp in copy.charTiles)
             {
@@ -45,20 +37,13 @@ namespace ClientUI.Drawing
                 charTiles.Add(kvp.Key, tmp);
             }
 
-            // copy the charIndex
-            charIndex = new char[copy.charIndex.Length];
-            for(int i = 0; i < copy.charIndex.Length; i++)
-            {
-                // this copies the value rather than the address
-                charIndex[i] = copy.charIndex[i];
-            }
-
-            // copy the tileIndex
+            // create the char and tile index corresponding to the dictionaries
+            // this is usefull for faster parsing a bigger string
+            charIndex = charTiles.Keys.ToArray();
             tileIndex = new Tile[charIndex.Length];
-            for(int i = 0; i < copy.tileIndex.Length; i++)
+            for (int i = 0; i < charIndex.Length; i++)
             {
-                // this uses the copy-constructor of the tile to create a copy rather than copy the address
-                tileIndex[i] = new Tile(copy.tileIndex[i]);
+                tileIndex[i] = Parse(charIndex[i], 0, 1, 16);
             }
         }
 
@@ -79,139 +64,100 @@ namespace ClientUI.Drawing
             return new Tile(placement, sprite);
         }
 
-        internal Tile Parse(string name, int stringIndex, int stringWidth, int tileSize)
-        {
-            // get the src location from the namelist
-            TileSrcLocation srcLocation = nameTiles[name];
-
-            // convert the string-index to a x and y coordinate
-            int x = stringIndex % stringWidth * tileSize;
-            int y = stringIndex / stringWidth * tileSize;
-
-            // copy the data to Rectangles
-            Rectangle placement = new Rectangle(x, y, tileSize, tileSize);
-            Rectangle sprite = new Rectangle(srcLocation.position.X, srcLocation.position.Y, srcLocation.widthHeight.X, srcLocation.widthHeight.Y);
-
-            // return a new instance of a tile
-            return new Tile(placement, sprite);
-        }
-
-        internal List<Tile> ParseText(string text, int textWidth, int tileSize)
+        internal static List<Tile> ParseTextNew(string text, int textWidth, int tileSize, TileRules extraRules, ParseToTileFactory referenceFactory, ParseToTile referenceParser, string sceneName)
         {
             List<Tile> tiles = new List<Tile>();
-            // presets for the types of tiles
-            Tile floorTile = Parse("floor", 0, 1, tileSize);
-            Tile monsterTile = Parse("monster", 0, 1, tileSize);
-            Tile playerTile = Parse("player", 0, 1, tileSize);
-            Tile otherPlayerTile = Parse("otherp", 0, 1, tileSize);
-            Tile wallTile = Parse("wallHorizontal", 0, 1, tileSize);
-            Tile cornerTile = Parse("cornerTopRight", 0, 1, tileSize);
-            Tile doorTile = Parse("door", 0, 1, tileSize);
-            Tile healTile = Parse("healpot", 0, 1, tileSize);
-            Tile xpTile = Parse("xppot", 0, 1, tileSize);
-            Tile flagTile = Parse("flag", 0, 1, tileSize);
 
-            // now turn the text int a list of tiles
+            // create a second temporary parser to accomadate for the forced rules
+            // and for the specified rules per block per scene
+            ParseToTile secondary = null;
+            BlockDataObject[] currentDataObjects = null;
+
+            // check if the current scene even has a forced-theme
+            bool hasRules = extraRules.LevelObjects.TryGetValue(sceneName, out LevelObject currentSceneRules);
+            bool hasForced = false;
+
+            if (hasRules && currentSceneRules.ForcedTheme != null)
+            {
+                currentDataObjects = currentSceneRules.Data;
+                try
+                {
+                    secondary = referenceFactory.Create(currentSceneRules.ForcedTheme);
+                    hasForced = true;
+                }
+                catch { };
+            }
+
             for (int i = 0; i < text.Length; i++)
             {
-                Tile t = null;
-                // optimizing the code itself
                 if (text[i] == ' ')
                 {
                     continue;
                 }
-                // now copy the pre-parsed tiles
-                switch (text[i])
-                {
-                    // floor-tile
-                    case '·':
-                    case '*':
-                        t = new Tile(floorTile);
-                        break;
-                    // monster-til
-                    case '@':
-                        t = new Tile(monsterTile);
-                        break;
-                    // player-tile
-                    case '¶':
-                        t = new Tile(playerTile);
-                        break;
-                    // other-player-tile
-                    case '?':
-                        t = new Tile(otherPlayerTile);
-                        break;
-                    // walls
-                    case '│':
-                    case '─':
-                    case '#':
-                        t = new Tile(wallTile);
-                        break;
-                    // corner tiles
-                    case '┐':
-                    case '┌':
-                    case '└':
-                    case '┘':
-                        t = new Tile(cornerTile);
-                        break;
-                    // door tiles
-                    case '$':
-                        t = new Tile(doorTile);
-                        break;
-                    // healing pots
-                    case '+':
-                        t = new Tile(healTile);
-                        break;
-                    // xp pots
-                    case '&':
-                        t = new Tile(xpTile);
-                        break;
-                    // flag
-                    case '!':
-                        t = new Tile(flagTile);
-                        break;
-                }
 
-                if (t == null)
-                {
-                    continue;
-                }
-
-                // set the correct cords of the pre-parsed copy
+                // convert the string-index to an x and y coördinate
                 int x = i % textWidth;
                 int y = i / textWidth;
 
-                t.placement.X = x * tileSize;
-                t.placement.Y = y * tileSize;
-                tiles.Add(t);
-            }
-            return tiles;
-        }
-
-        internal List<Tile> ParseTextNew(string text, int textWidth, int tileSize)
-        {
-            List<Tile> tiles = new List<Tile>();
-            
-            for(int i = 0; i < text.Length; i++)
-            {
-                if(text[i] == ' ')
+                if (hasRules)
                 {
-                    continue;
+                    foreach (BlockDataObject data in currentDataObjects)
+                    {
+                        if (!(data.Position[0] == x && data.Position[1] == y))
+                        {
+                            continue;
+                        }
+
+                        for (int j = 0; j < data.BlockRules.Length; j++)
+                        {
+                            if (data.BlockRules[j][0][0] != text[i])
+                            {
+                                continue;
+                            }
+
+                            string newTheme = data.BlockRules[j][1];
+                            if(newTheme.Contains(','))
+                            {
+                                string[] splitted = newTheme.Split(',');
+                                // replace the old value with the new src-location
+                                char key = data.BlockRules[j][0][0];
+                                Point xy = new Point(int.Parse(splitted[0]), int.Parse(splitted[1]));
+                                Point wh = new Point(int.Parse(splitted[2]), int.Parse(splitted[3]));
+                                TileSrcLocation newSrc = new TileSrcLocation(xy, wh);
+                                secondary.charTiles.Remove(key);
+                                secondary.charTiles.Add(key, newSrc);
+                                secondary = new ParseToTile(secondary);
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    secondary = referenceFactory.Create(newTheme);
+                                }
+                                catch { };
+                            }
+                        }
+                    }
                 }
                 // current character
                 char cc = text[i];
 
                 // current character-index
-                int ccI = Array.IndexOf(charIndex, cc);
-                if(ccI == -1)
+                int ccI = Array.IndexOf(referenceParser.charIndex, cc);
+                if (secondary != null && hasRules)
+                {
+                    ccI = Array.IndexOf(secondary.charIndex, cc);
+                }
+                if (ccI == -1)
                 {
                     continue;
                 }
                 // current tile
-                Tile ccT = new Tile(tileIndex[ccI]);
-
-                // convert the string-index to an x and y coördinate
-                int x = i % textWidth;
-                int y = i / textWidth;
+                Tile ccT = new Tile(referenceParser.tileIndex[ccI]);
+                if (secondary != null && hasRules)
+                {
+                    ccT = new Tile(secondary.tileIndex[ccI]);
+                }
 
                 // now correct the placement
                 ccT.placement.X = x * tileSize;
@@ -221,6 +167,20 @@ namespace ClientUI.Drawing
 
                 // and add the current tile to the list of tiles
                 tiles.Add(ccT);
+
+                if (hasRules && currentSceneRules.ForcedTheme != null)
+                {
+                    try
+                    {
+                        secondary = referenceFactory.Create(currentSceneRules.ForcedTheme);
+                        hasForced = true;
+                    }
+                    catch
+                    {
+                        secondary = new ParseToTile(referenceParser);
+                        hasForced = false;
+                    };
+                }
             }
             return tiles;
         }
