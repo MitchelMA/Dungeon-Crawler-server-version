@@ -1,0 +1,19 @@
+﻿{
+  "Test level": {
+    "forced-theme": "Red",
+    "data": [
+      {
+        "position": [ 0, 0 ],
+        "block-rules": [
+          [ "┌", "Blue" ]
+        ]
+      },
+      {
+        "position": [ 1, 0 ],
+        "block-rules": [
+          [ "─", "Green" ]
+        ]
+      }
+    ]
+  }
+}

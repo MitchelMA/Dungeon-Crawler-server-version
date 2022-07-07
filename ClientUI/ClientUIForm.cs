@@ -3,6 +3,7 @@ using System.Drawing.Drawing2D;
 using ClientUI.Drawing;
 using ClientUI.Client;
 using System.Diagnostics;
+using ClientUI.Drawing.ParsingObjects;
 using Shared;
 
 namespace ClientUI
@@ -25,6 +26,7 @@ namespace ClientUI
         private List<Tile> tiles = new List<Tile>();
         private int fieldWidth = 10;
         private int tileSize = 16;
+        private TileRules tileRules;
 
         // other tasks
         // connection task
@@ -33,8 +35,6 @@ namespace ClientUI
         CancellationToken connectionCToken;
         public ClientUIForm()
         {
-            InitializeComponent();
-
             // set the directory in which the tilemaps will go
             tileDirectory = Path.Combine(exeDir, @".\TileMaps\");
 
@@ -42,6 +42,13 @@ namespace ClientUI
             parserFactory = new ParseToTileFactory();
             spriteMapperFileName = parserFactory.Load(tileDirectory);
 
+            InitializeComponent();
+            DoubleBuffered = true;
+            FormClosing += ClientUIForm_FormClosing;
+        }
+
+        private void ClientUIForm_Load(object sender, EventArgs e)
+        {
             // now create a dropdown at the theme menu-strip-item
             ThemeTSMI.DropDownItems.Clear();
             foreach(string filename in spriteMapperFileName)
@@ -64,10 +71,11 @@ namespace ClientUI
             // reading from a spritesheet or "bitmap" is weird: you need uneven, preceding cords for the x-axis
             // for instance, if you want to have sprite with an x-cord of `22`, your input x-cord should be `21`
             // why? I don't know, that's just how it works or something?
-            spriteSheet = Bitmap.FromFile(Path.Combine(exeDir, "sprites.png"));
+            spriteSheet = Bitmap.FromFile(Path.Combine(exeDir, @"sprites-assets\sprites.png"));
             Text = standText;
-            DoubleBuffered = true;
-            FormClosing += ClientUIForm_FormClosing;
+
+            // parse the json with the tilerules
+            tileRules = new TileRules(@".\TileMaps\TileCostumes.json");
         }
 
         private void ClientUIForm_FormClosing(object? sender, FormClosingEventArgs e)
@@ -263,5 +271,7 @@ namespace ClientUI
             PlayerInfoL.Text = "";
             Invalidate();
         }
+
+
     }
 }
