@@ -45,6 +45,10 @@ namespace ClientUI.Drawing
         internal ParseToTile Load(string[] parseText)
         {
             Dictionary<char, TileSrcLocation> chars = new Dictionary<char, TileSrcLocation>();
+            if(parseText == null)
+            {
+                return new ParseToTile(chars);
+            }
             foreach(string line in parseText)
             {
                 string[] lineParts = line.Trim().Split(',');

@@ -75,7 +75,7 @@ namespace ClientUI
             Text = standText;
 
             // parse the json with the tilerules
-            tileRules = new TileRules(@".\TileMaps\TileCostumes.json");
+            tileRules = new TileRules(@".\TileMaps\SceneRules.json");
         }
 
         private void ClientUIForm_FormClosing(object? sender, FormClosingEventArgs e)

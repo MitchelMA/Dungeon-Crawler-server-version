@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="TileMaps\TileCostumes.json" />
+    <None Remove="TileMaps\SceneRules.json" />
   </ItemGroup>
 
   <ItemGroup>

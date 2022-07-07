@@ -47,12 +47,17 @@ namespace ClientUI.Drawing
             }
         }
 
+        /// <summary>
+        /// Adds another parser to this one.
+        /// It will overwrite values in this parser if it conflicts with current values
+        /// </summary>
+        /// <param name="other"></param>
         internal void Combine(ParseToTile other)
         {
-            foreach(KeyValuePair<char, TileSrcLocation> kvp in other.charTiles)
+            foreach (KeyValuePair<char, TileSrcLocation> kvp in other.charTiles)
             {
                 // overwrite the old value if it already existed
-                if(charTiles.TryGetValue(kvp.Key, out _))
+                if (charTiles.TryGetValue(kvp.Key, out _))
                 {
                     charTiles.Remove(kvp.Key);
                     charTiles.Add(kvp.Key, kvp.Value);
@@ -94,27 +99,27 @@ namespace ClientUI.Drawing
         {
             List<Tile> tiles = new List<Tile>();
 
-            // create a second temporary parser to accomadate for the forced rules
+            // create a new instance of a parser that is a copy of the referenceParser 
+            ParseToTile parser = new ParseToTile(referenceParser);
             // and for the specified rules per block per scene
-            ParseToTile secondary = null;
             BlockDataObject[] currentDataObjects = null;
 
             // check if the current scene even has a forced-theme
             bool hasRules = extraRules.LevelObjects.TryGetValue(sceneName, out LevelObject currentSceneRules);
-            bool hasForced = false;
-
-            if (hasRules && currentSceneRules.ForcedTheme != null)
+            // if it does, setup the parser accordingly
+            if (hasRules)
             {
+                // get the data for per-cord parsing
                 currentDataObjects = currentSceneRules.Data;
                 try
                 {
-                    secondary = referenceFactory.Create(currentSceneRules.ForcedTheme);
-                    hasForced = true;
-
-                    ParseToTile injected = referenceFactory.Load(currentSceneRules.Injection);
-                    secondary.Combine(injected);
+                    // try to get a parser for the forced theme
+                    parser = referenceFactory.Create(currentSceneRules.ForcedTheme);
                 }
                 catch { };
+                // create a parser to inject parsing-rules per scene
+                ParseToTile injected = referenceFactory.Load(currentSceneRules.Injection);
+                parser.Combine(injected);
             }
 
             for (int i = 0; i < text.Length; i++)
@@ -128,65 +133,79 @@ namespace ClientUI.Drawing
                 int x = i % textWidth;
                 int y = i / textWidth;
 
-                if (hasRules)
+                // check if the scene has extra parsing-rules
+                if (!(currentDataObjects != null && hasRules))
                 {
-                    foreach (BlockDataObject data in currentDataObjects)
+                    goto skipOne;
+                }
+
+                foreach (BlockDataObject data in currentDataObjects)
+                {
+                    // check if cords are the same
+                    if (!(data.Position[0] == x && data.Position[1] == y))
                     {
-                        if (!(data.Position[0] == x && data.Position[1] == y))
+                        continue;
+                    }
+
+                    for (int j = 0; j < data.BlockRules.Length; j++)
+                    {
+                        // check if the defined characters for the rule match up
+                        if (data.BlockRules[j][0][0] != text[i])
                         {
                             continue;
                         }
 
-                        for (int j = 0; j < data.BlockRules.Length; j++)
+                        // a parsing-rule can done in two ways:
+                        // giving a rulesheet name:  ["?", "Red"]
+                        // or giving tile-source locations: ["?", "00,00,16,16"]
+                        string newTheme = data.BlockRules[j][1];
+                        // check if a tile-source location was given
+                        if (newTheme.Contains(','))
                         {
-                            if (data.BlockRules[j][0][0] != text[i])
-                            {
-                                continue;
-                            }
-
-                            string newTheme = data.BlockRules[j][1];
-                            if(newTheme.Contains(','))
+                            try
                             {
                                 string[] splitted = newTheme.Split(',');
                                 // replace the old value with the new src-location
                                 char key = data.BlockRules[j][0][0];
+                                // get the new source-location
                                 Point xy = new Point(int.Parse(splitted[0]), int.Parse(splitted[1]));
                                 Point wh = new Point(int.Parse(splitted[2]), int.Parse(splitted[3]));
                                 TileSrcLocation newSrc = new TileSrcLocation(xy, wh);
-                                secondary.charTiles.Remove(key);
-                                secondary.charTiles.Add(key, newSrc);
-                                secondary = new ParseToTile(secondary);
+                                // remove the old value and add the new one
+                                parser.charTiles.Remove(key);
+                                parser.charTiles.Add(key, newSrc);
+                                // now create a new instance
+                                // this has to be done because the constructor does something with private arrays
+                                // this is necessary, else it won't work
+                                parser = new ParseToTile(parser);
                             }
-                            else
+                            catch { };
+                        }
+                        // else we try to take it as a name
+                        else
+                        {
+                            try
                             {
-                                try
-                                {
-                                    secondary = referenceFactory.Create(newTheme);
-                                }
-                                catch { };
+                                parser = referenceFactory.Create(newTheme);
                             }
+                            catch { };
                         }
                     }
                 }
+
+            skipOne:
                 // current character
                 char cc = text[i];
 
                 // current character-index
-                int ccI = Array.IndexOf(referenceParser.charIndex, cc);
-                if (secondary != null && hasRules)
-                {
-                    ccI = Array.IndexOf(secondary.charIndex, cc);
-                }
+                int ccI = Array.IndexOf(parser.charIndex, cc);
                 if (ccI == -1)
                 {
                     continue;
                 }
+
                 // current tile
-                Tile ccT = new Tile(referenceParser.tileIndex[ccI]);
-                if (secondary != null && hasRules)
-                {
-                    ccT = new Tile(secondary.tileIndex[ccI]);
-                }
+                Tile ccT = new Tile(parser.tileIndex[ccI]);
 
                 // now correct the placement
                 ccT.placement.X = x * tileSize;
@@ -199,19 +218,22 @@ namespace ClientUI.Drawing
 
                 if (hasRules && currentSceneRules.ForcedTheme != null)
                 {
+                    // reset the parser back to the forcedTheme
+                    // if this fails, we assume it was the referenceParsers
                     try
                     {
-                        secondary = referenceFactory.Create(currentSceneRules.ForcedTheme);
-                        hasForced = true;
-
-                        ParseToTile injected = referenceFactory.Load(currentSceneRules.Injection);
-                        secondary.Combine(injected);
+                        parser = referenceFactory.Create(currentSceneRules.ForcedTheme);
                     }
                     catch
                     {
-                        secondary = new ParseToTile(referenceParser);
-                        hasForced = false;
+                        parser = new ParseToTile(referenceParser);
                     };
+                    
+                    // alwasy at the injection
+                    // this cannot give a null-exception
+                    // since the Load will always return a parsers, with no capability to parse if necessary
+                    ParseToTile injected = referenceFactory.Load(currentSceneRules.Injection);
+                    parser.Combine(injected);
                 }
             }
             return tiles;
